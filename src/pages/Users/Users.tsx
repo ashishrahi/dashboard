@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import ReactPaginate from 'react-paginate';
 import { BRAND } from '../../types/brand';
 import BrandOne from '../../images/brand/brand-01.svg';
 import BrandTwo from '../../images/brand/brand-02.svg';
@@ -7,51 +8,17 @@ import BrandFour from '../../images/brand/brand-04.svg';
 import BrandFive from '../../images/brand/brand-05.svg';
 
 const initialBrandData: BRAND[] = [
+  // Add your initial brand data here
   {
     logo: BrandOne,
-    name: 'Google',
-    visitors: 3.5,
-    revenues: '5,768',
-    sales: 590,
-    conversion: 4.8,
+    name: 'Brand One',
+    visitors: 100,
+    revenues: '5000',
+    sales: 200,
+    conversion: 5,
     status: 'Active',
   },
-  {
-    logo: BrandTwo,
-    name: 'Twitter',
-    visitors: 2.2,
-    revenues: '4,635',
-    sales: 467,
-    conversion: 4.3,
-    status: 'Inactive',
-  },
-  {
-    logo: BrandThree,
-    name: 'Github',
-    visitors: 2.1,
-    revenues: '4,290',
-    sales: 420,
-    conversion: 3.7,
-    status: 'Active',
-  },
-  {
-    logo: BrandFour,
-    name: 'Vimeo',
-    visitors: 1.5,
-    revenues: '3,580',
-    sales: 389,
-    conversion: 2.5,
-    status: 'Inactive',
-  },
-  {
-    logo: BrandFive,
-    name: 'Facebook',
-    visitors: 3.5,
-    revenues: '6,768',
-    sales: 390,
-    conversion: 4.2,
-    status: 'Active',
-  },
+  // Add more brands as needed
 ];
 
 const TableOne = () => {
@@ -70,6 +37,21 @@ const TableOne = () => {
   const [imagePreview, setImagePreview] = useState<string | ArrayBuffer | null>(null);
   const [openMenuIndex, setOpenMenuIndex] = useState<number | null>(null);
 
+  // Pagination States
+  const [currentPage, setCurrentPage] = useState(0);
+  const itemsPerPage = 5;
+
+  const handlePageClick = (data: { selected: number }) => {
+    setCurrentPage(data.selected);
+  };
+
+  const paginatedBrands = brands.slice(
+    currentPage * itemsPerPage,
+    (currentPage + 1) * itemsPerPage
+  );
+
+  const pageCount = Math.ceil(brands.length / itemsPerPage);
+
   const openModal = (index: number | null) => {
     setEditIndex(index);
     setIsModalOpen(true);
@@ -84,7 +66,7 @@ const TableOne = () => {
   };
 
   const createBrand = () => {
-    if (newBrand.name) {
+    if (newBrand.name && newBrand.logo) {
       setBrands([...brands, newBrand]);
       closeModal();
     }
@@ -150,7 +132,7 @@ const TableOne = () => {
 
       <button
         onClick={() => openModal(null)}
-        className="bg-blue-500 text-white p-2 rounded mb-4 hover:bg-blue-600"
+        className="bg-green-500 text-white p-2 rounded mb-4 hover:bg-green-600"
       >
         Add Brand
       </button>
@@ -168,7 +150,7 @@ const TableOne = () => {
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
-          {brands.map((brand, index) => (
+          {paginatedBrands.map((brand, index) => (
             <tr key={index}>
               <td className="px-6 py-4 whitespace-nowrap flex items-center">
                 <img src={brand.logo} alt={brand.name} className="w-8 h-8 mr-3" />
@@ -231,12 +213,36 @@ const TableOne = () => {
         </tbody>
       </table>
 
+      <ReactPaginate
+        previousLabel={"Previous"}
+        nextLabel={"Next"}
+        breakLabel={"..."}
+        pageCount={pageCount}
+        marginPagesDisplayed={2}
+        pageRangeDisplayed={5}
+        onPageChange={handlePageClick}
+        containerClassName={"flex justify-center space-x-2 mt-4"}
+        pageClassName={"cursor-pointer px-3 py-1 border border-gray-300 rounded-md"}
+        pageLinkClassName={"text-gray-700"}
+        activeClassName={"bg-green-500 text-white"}
+        previousClassName={"cursor-pointer px-3 py-1 border border-gray-300 rounded-md"}
+        nextClassName={"cursor-pointer px-3 py-1 border border-gray-300 rounded-md"}
+        disabledClassName={"cursor-not-allowed opacity-50"}
+      />
+
       {isModalOpen && (
         <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex justify-center items-center">
-          <div className="bg-blue-500 p-6 rounded shadow-lg"> {/* Modal background updated */}
-            <h2 className="text-xl font-semibold mb-4 text-white">
+          <div className="bg-white p-6 rounded shadow-lg w-full max-w-lg relative">
+            <button
+              onClick={closeModal}
+              className="absolute top-2 right-2 text-gray-600 hover:text-gray-900"
+            >
+              ×
+            </button>
+            <h2 className="text-xl font-semibold mb-4 text-gray-900">
               {editIndex !== null ? 'Edit Brand' : 'Add Brand'}
             </h2>
+            <span className="block mb-4 text-gray-600">Please fill out the details below:</span>
             <input
               type="text"
               name="name"
@@ -277,15 +283,19 @@ const TableOne = () => {
               placeholder="Conversion (%)"
               className="mb-2 p-2 border border-gray-300 rounded w-full"
             />
-            <select
-              name="status"
-              value={newBrand.status}
-              onChange={handleInputChange}
-              className="mb-2 p-2 border border-gray-300 rounded w-full"
-            >
-              <option value="Active">Active</option>
-              <option value="Inactive">Inactive</option>
-            </select>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleFileChange}
+              className="mb-2"
+            />
+            {imagePreview && (
+              <img
+                src={imagePreview as string}
+                alt="Preview"
+                className="mb-4 w-32 h-32 object-cover"
+              />
+            )}
 
             <div className="flex justify-end space-x-4">
               <button
@@ -296,7 +306,7 @@ const TableOne = () => {
               </button>
               <button
                 onClick={editIndex !== null ? updateBrand : createBrand}
-                className="bg-blue-700 text-white p-2 rounded hover:bg-blue-800"
+                className="bg-green-700 text-white p-2 rounded hover:bg-green-800"
               >
                 {editIndex !== null ? 'Update' : 'Create'}
               </button>

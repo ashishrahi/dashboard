@@ -426,7 +426,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                                 (isActive && '!text-white')
                               }
                             >
-                             CategoryList
+                             Category List
                             </NavLink>
                           </li>
                           <li>
@@ -510,7 +510,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                             </clipPath>
                           </defs>
                         </svg>
-                        SubCategory
+                        Sub Category
                         <svg
                           className={`absolute right-4 top-1/2 -translate-y-1/2 fill-current ${
                             open && 'rotate-180'
@@ -544,7 +544,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                                 (isActive && '!text-white')
                               }
                             >
-                             SubCategoryList
+                             SubCategory List
                             </NavLink>
                           </li>
                           <li>
@@ -771,7 +771,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                             </clipPath>
                           </defs>
                         </svg>
-                        Warehouse List
+                        Warehouses
                         <svg
                           className={`absolute right-4 top-1/2 -translate-y-1/2 fill-current ${
                             open && 'rotate-180'
@@ -805,7 +805,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                                 (isActive && '!text-white')
                               }
                             >
-                             CategoryList
+                             Warehouse List
                             </NavLink>
                           </li>
                           <li>
@@ -1042,7 +1042,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                                 (isActive && '!text-white')
                               }
                             >
-                             Driver List
+                             Finance List
                             </NavLink>
                           </li>
                           
@@ -1161,7 +1161,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                                 (isActive && '!text-white')
                               }
                             >
-                             Driver List
+                             Payment List
                             </NavLink>
                           </li>
                           
@@ -1280,7 +1280,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                                 (isActive && '!text-white')
                               }
                             >
-                             Driver List
+                             Role Manager List
                             </NavLink>
                           </li>
                           
@@ -1531,7 +1531,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                                 (isActive && '!text-white')
                               }
                             >
-                             CategoryList
+                             Privacy Policy
                             </NavLink>
                           </li>
                           <li>
@@ -1542,7 +1542,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                                 (isActive && '!text-white')
                               }
                             >
-                              Active
+                              About Us
                             </NavLink>
                           </li>
                           <li>
@@ -1553,7 +1553,51 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                                 (isActive && '!text-white')
                               }
                             >
-                              InActive
+                              Contact Us
+                            </NavLink>
+                          </li>
+                          <li>
+                            <NavLink
+                              to="/ui/buttons"
+                              className={({ isActive }) =>
+                                'group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ' +
+                                (isActive && '!text-white')
+                              }
+                            >
+                              Terms & Conditions
+                            </NavLink>
+                          </li>
+                          <li>
+                            <NavLink
+                              to="/ui/buttons"
+                              className={({ isActive }) =>
+                                'group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ' +
+                                (isActive && '!text-white')
+                              }
+                            >
+                              Contact Support
+                            </NavLink>
+                          </li>
+                          <li>
+                            <NavLink
+                              to="/ui/buttons"
+                              className={({ isActive }) =>
+                                'group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ' +
+                                (isActive && '!text-white')
+                              }
+                            >
+                              How it Works
+                            </NavLink>
+                          </li>
+                          <li>
+                            <NavLink
+                              to="/ui/buttons"
+                              className={({ isActive }) =>
+                                'group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ' +
+                                (isActive && '!text-white')
+                              }
+                            >
+                              Scrap Impact
                             </NavLink>
                           </li>
                         </ul>
@@ -1636,6 +1680,93 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
                           />
                         </svg>
                       </NavLink>
+                        {/* <!-- Dropdown Menu Start --> */}
+                        <div
+                        className={`translate transform overflow-hidden ${
+                          !open && 'hidden'
+                        }`}
+                      >
+                        <ul className="mb-5.5 mt-4 flex flex-col gap-2.5 pl-6">
+                          <li>
+                            <NavLink
+                              to="/users"
+                              className={({ isActive }) =>
+                                'group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ' +
+                                (isActive && '!text-white')
+                              }
+                            >
+                             Privacy Policy
+                            </NavLink>
+                          </li>
+                          <li>
+                            <NavLink
+                              to="/ui/buttons"
+                              className={({ isActive }) =>
+                                'group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ' +
+                                (isActive && '!text-white')
+                              }
+                            >
+                              About Us
+                            </NavLink>
+                          </li>
+                          <li>
+                            <NavLink
+                              to="/ui/buttons"
+                              className={({ isActive }) =>
+                                'group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ' +
+                                (isActive && '!text-white')
+                              }
+                            >
+                              Contact Us
+                            </NavLink>
+                          </li>
+                          <li>
+                            <NavLink
+                              to="/ui/buttons"
+                              className={({ isActive }) =>
+                                'group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ' +
+                                (isActive && '!text-white')
+                              }
+                            >
+                              Terms & Conditions
+                            </NavLink>
+                          </li>
+                          <li>
+                            <NavLink
+                              to="/ui/buttons"
+                              className={({ isActive }) =>
+                                'group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ' +
+                                (isActive && '!text-white')
+                              }
+                            >
+                              Contact Support
+                            </NavLink>
+                          </li>
+                          <li>
+                            <NavLink
+                              to="/ui/buttons"
+                              className={({ isActive }) =>
+                                'group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ' +
+                                (isActive && '!text-white')
+                              }
+                            >
+                              How it Works
+                            </NavLink>
+                          </li>
+                          <li>
+                            <NavLink
+                              to="/ui/buttons"
+                              className={({ isActive }) =>
+                                'group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white ' +
+                                (isActive && '!text-white')
+                              }
+                            >
+                              Scrap Impact
+                            </NavLink>
+                          </li>
+                        </ul>
+                      </div>
+
               
 
                     </React.Fragment>
