@@ -115,14 +115,14 @@ const TableOne = () => {
 
   return (
     <div className="p-6 bg-white shadow-md rounded-lg">
-      <h4 className="text-xl font-semibold mb-4">Orders</h4>
+      <h4 className="text-xl font-semibold mb-4">Category</h4>
 
-      {/* <button
+      <button
         onClick={() => openModal(null)}
         className="bg-green-500 text-white p-2 rounded mb-4 hover:bg-green-600"
       >
         Add Category
-      </button> */}
+      </button>
 
       <table className="min-w-full divide-y divide-gray-200">
         <thead className="bg-gray-50">

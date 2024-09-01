@@ -3,21 +3,20 @@ import { Route, Routes, useLocation } from 'react-router-dom';
 
 import Loader from './common/Loader';
 import PageTitle from './components/PageTitle';
-import SignIn from './pages/Authentication/SignIn';
 import SignUp from './pages/Authentication/SignUp';
-import Calendar from './pages/Calendar';
-import Chart from './pages/Chart';
 import ECommerce from './pages/Dashboard/ECommerce';
-import FormElements from './pages/Form/FormElements';
-import FormLayout from './pages/Form/FormLayout';
-import Profile from './pages/Profile';
-import Settings from './pages/Settings';
-import Tables from './pages/Tables';
-import Alerts from './pages/UiElements/Alerts';
-import Buttons from './pages/UiElements/Buttons';
+import Orders from './pages/Orders/Orders';
+import Warehouse from './pages/Warehouse/Warehouse';
+import Subcategory from './pages/Sub Category/SubCategory';
+import FinanceDepartment from './pages/Finance Department/FinanceDepartment';
+import Drivers from './pages/Drivers/Drivers';
 import DefaultLayout from './layout/DefaultLayout';
 import Users from '../src/pages/Users/Users'
-
+import Category from '../src/pages/Category/Category'
+import PaymentRequest from './pages/Payment Request/PaymentRequest';
+import RoleMangers from './pages/Role Mangers/RoleMangers';
+import Collection from '../src/pages/Collections/Collections'
+import ContactUs from './pages/Contact Us/ContactUs';
 function App() {
   const [loading, setLoading] = useState<boolean>(true);
   const { pathname } = useLocation();
@@ -35,6 +34,7 @@ function App() {
   ) : (
     <DefaultLayout>
       <Routes>
+        {/* Dashboard */}
         <Route index element={
             <>
               <PageTitle title="eCommerce Dashboard" />
@@ -42,6 +42,7 @@ function App() {
             </>
           }
         />
+        {/* Users */}
             <Route
           path="/users"
           element={
@@ -51,93 +52,100 @@ function App() {
             </>
           }
         />
+        {/* Category */}
         <Route
-          path="/calendar"
+          path="/category"
           element={
             <>
-              <PageTitle title="Calendar" />
-              <Calendar />
+              <PageTitle title="Category" />
+              <Category />
             </>
           }
         />
+        {/* Sub Category */}
         <Route
-          path="/profile"
+          path="/subcategory"
           element={
             <>board T
-              <PageTitle title="Profile" />
-              <Profile />
+              <PageTitle title="Subcategory" />
+              <Subcategory />
             </>
           }
         />
+        {/* Orders */}
         <Route
-          path="/forms/form-elements"
+          path="/orders"
           element={
             <>
-              <PageTitle title="Form Elements" />
-              <FormElements />
+              <PageTitle title="Orders" />
+              <Orders />
             </>
           }
         />
+        {/* Warehouse */}
         <Route
-          path="/forms/form-layout"
+          path="/warehouse"
           element={
             <>
-              <PageTitle title="Form Layout" />
-              <FormLayout />
+              <PageTitle title="Warehouse" />
+              <Warehouse />
             </>
           }
         />
+        {/* Drivers */}
         <Route
-          path="/tables"
+          path="/drivers"
           element={
             <>
               <PageTitle title="Tables" />
-              <Tables />
+              <Drivers />
+            </>
+          }
+        />
+        {/* Finance Department */}
+        <Route
+          path="/finacedepartment"
+          element={
+            <>
+              <PageTitle title="Finance Department" />
+              <FinanceDepartment />
+            </>
+          }
+        />
+        {/* Payment Request */}
+        <Route
+          path="/paymentrequest"
+          element={
+            <>
+              <PageTitle title="Payment Request" />
+              <PaymentRequest />
             </>
           }
         />
         <Route
-          path="/settings"
+          path="/rolemanager"
           element={
             <>
-              <PageTitle title="Settings" />
-              <Settings />
+              <PageTitle title="Role Manager" />
+              <RoleMangers />
             </>
           }
         />
         <Route
-          path="/chart"
+          path="/collectionlist"
           element={
             <>
-              <PageTitle title="Basic Chart" />
-              <Chart />
+              <PageTitle title="Collection" />
+              <Collection />
             </>
           }
         />
         <Route
-          path="/ui/alerts"
+          path="contactus"
           element={
             <>
-              <PageTitle title="Alerts" />
-              <Alerts />
-            </>
-          }
-        />
-        <Route
-          path="/ui/buttons"
-          element={
-            <>
-              <PageTitle title="Buttons" />
-              <Buttons />
-            </>
-          }
-        />
-        <Route
-          path="/auth/signin"
-          element={
-            <>
-              <PageTitle title="Signin" />
-              <SignIn />
+              <PageTitle title="Contact Us" />
+              <ContactUs />
             </>
           }
         />

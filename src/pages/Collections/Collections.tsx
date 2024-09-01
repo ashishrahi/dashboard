@@ -6,8 +6,10 @@ import BrandTwo from '../../images/brand/brand-02.svg';
 import BrandThree from '../../images/brand/brand-03.svg';
 import BrandFour from '../../images/brand/brand-04.svg';
 import BrandFive from '../../images/brand/brand-05.svg';
-import { Formik, Form, Field, FieldProps } from 'formik';
+import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
+import Snackbar from '../../components/Snackbar/Snackbar'; // Import the Snackbar component
+import {useUsersQuery} from '../../services/fetchApi/usersApi/mutation.api'
 
 const initialBrandData: BRAND[] = [
   {
@@ -38,6 +40,8 @@ const TableOne = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [imagePreview, setImagePreview] = useState<string | ArrayBuffer | null>(null);
   const [openMenuIndex, setOpenMenuIndex] = useState<number | null>(null);
+  const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
+  const [snackbarMessage, setSnackbarMessage] = useState<string>('');
 
   // Pagination States
   const [currentPage, setCurrentPage] = useState(0);
@@ -74,16 +78,21 @@ const TableOne = () => {
   const handleFormSubmit = useCallback((values: BRAND) => {
     if (editIndex === null) {
       setBrands([...brands, values]);
+      setSnackbarMessage('Brand added successfully!');
     } else {
       const updatedBrands = [...brands];
       updatedBrands[editIndex] = values;
       setBrands(updatedBrands);
+      setSnackbarMessage('Brand updated successfully!');
     }
+    setSnackbarOpen(true);
     closeModal();
   }, [editIndex, brands, closeModal]);
 
   const deleteBrand = useCallback((index: number) => {
     setBrands(brands.filter((_, i) => i !== index));
+    setSnackbarMessage('Brand deleted successfully!');
+    setSnackbarOpen(true);
   }, [brands]);
 
   const resetForm = () => {
@@ -111,18 +120,13 @@ const TableOne = () => {
     updatedBrands[index].status = status;
     setBrands(updatedBrands);
     setOpenMenuIndex(null);
+    setSnackbarMessage(`Brand ${status === 'Active' ? 'activated' : 'deactivated'} successfully!`);
+    setSnackbarOpen(true);
   };
 
   return (
     <div className="p-6 bg-white shadow-md rounded-lg">
-      <h4 className="text-xl font-semibold mb-4">Orders</h4>
-
-      {/* <button
-        onClick={() => openModal(null)}
-        className="bg-green-500 text-white p-2 rounded mb-4 hover:bg-green-600"
-      >
-        Add Category
-      </button> */}
+      <h4 className="text-xl font-semibold mb-4">Collections</h4>
 
       <table className="min-w-full divide-y divide-gray-200">
         <thead className="bg-gray-50">
@@ -197,12 +201,12 @@ const TableOne = () => {
         pageRangeDisplayed={3}
         marginPagesDisplayed={2}
         onPageChange={handlePageClick}
-        containerClassName={"flex justify-center mt-4"}
-        activeClassName={"text-blue-500 font-bold"}
-        previousLabel={"Previous"}
-        nextLabel={"Next"}
-        previousClassName={"cursor-pointer px-3 py-1 border border-gray-300 rounded-md"}
-        nextClassName={"cursor-pointer px-3 py-1 border border-gray-300 rounded-md"}
+        containerClassName="flex justify-center mt-4"
+        activeClassName="text-blue-500 font-bold"
+        previousLabel="Previous"
+        nextLabel="Next"
+        previousClassName="cursor-pointer px-3 py-1 border border-gray-300 rounded-md"
+        nextClassName="cursor-pointer px-3 py-1 border border-gray-300 rounded-md"
       />
 
       {/* Modal */}
@@ -310,6 +314,13 @@ const TableOne = () => {
           )}
         </Formik>
       )}
+
+      {/* Snackbar */}
+      <Snackbar
+        message={snackbarMessage}
+        open={snackbarOpen}
+        onClose={() => setSnackbarOpen(false)}
+      />
     </div>
   );
 };

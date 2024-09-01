@@ -2,11 +2,7 @@ import React, { useState, useMemo, useCallback } from 'react';
 import ReactPaginate from 'react-paginate';
 import { BRAND } from '../../types/brand';
 import BrandOne from '../../images/brand/brand-01.svg';
-import BrandTwo from '../../images/brand/brand-02.svg';
-import BrandThree from '../../images/brand/brand-03.svg';
-import BrandFour from '../../images/brand/brand-04.svg';
-import BrandFive from '../../images/brand/brand-05.svg';
-import { Formik, Form, Field, FieldProps } from 'formik';
+import { Formik, Form, Field,  } from 'formik';
 import * as Yup from 'yup';
 
 const initialBrandData: BRAND[] = [
@@ -115,13 +111,13 @@ const TableOne = () => {
 
   return (
     <div className="p-6 bg-white shadow-md rounded-lg">
-      <h4 className="text-xl font-semibold mb-4">Orders</h4>
+      <h4 className="text-xl font-semibold mb-4">Contact Us</h4>
 
       {/* <button
         onClick={() => openModal(null)}
         className="bg-green-500 text-white p-2 rounded mb-4 hover:bg-green-600"
       >
-        Add Category
+        Add Finance Department
       </button> */}
 
       <table className="min-w-full divide-y divide-gray-200">
