@@ -233,8 +233,6 @@ export default function FullFeaturedCrudGrid() {
     { field: 'typep', headerName: 'Type', width: 180 },
     { field: 'address', headerName: 'Warehouse Address', width: 180 },
 
-
-
     {
       field: 'joinDate',
       headerName: 'Join date',
@@ -266,130 +264,162 @@ export default function FullFeaturedCrudGrid() {
       headerName: 'Actions',
       width: 180,
       cellClassName: 'actions',
-      renderCell: (params) => (
-        <>
-          <Button
-            aria-controls="simple-menu"
-            aria-haspopup="true"
-            onClick={(event) => handleMenuClick(event, params.id)}
-          >
-            <MoreVertIcon />
-          </Button>
-          <Menu
-            id="simple-menu"
-            anchorEl={anchorEl}
-            keepMounted
-            open={Boolean(anchorEl)}
-            onClose={handleCloseMenu}
-          >
-            <MenuItem onClick={handleMenuAction('edit')}>Edit</MenuItem>
-            <MenuItem onClick={handleMenuAction('delete')}>Delete</MenuItem>
-            <MenuItem onClick={handleMenuAction('toggleStatus')}>Toggle Status</MenuItem>
-          </Menu>
-        </>
-      ),
+      renderCell: (params) => {
+        return (
+          <Box>
+            <Button
+              id="menu-button"
+              aria-controls={anchorEl ? 'menu' : undefined}
+              aria-haspopup="true"
+              aria-expanded={anchorEl ? 'true' : undefined}
+              onClick={(event) => handleMenuClick(event, params.id)}
+            >
+              <MoreVertIcon />
+            </Button>
+            <Menu
+              id="menu"
+              anchorEl={anchorEl}
+              open={Boolean(anchorEl)}
+              onClose={handleCloseMenu}
+              MenuListProps={{
+                'aria-labelledby': 'menu-button',
+              }}
+            >
+              <MenuItem onClick={handleMenuAction('edit')}>Edit</MenuItem>
+              <MenuItem onClick={handleMenuAction('delete')}>Delete</MenuItem>
+              <MenuItem onClick={handleMenuAction('toggleStatus')}>
+                Toggle Status
+              </MenuItem>
+            </Menu>
+          </Box>
+        );
+      },
     },
   ];
 
   const handleModalChange = (field: string, value: any) => {
-    if (modalRow) {
-      const newValue = field === 'joinDate' ? new Date(value) : value;
-      setModalRow({ ...modalRow, [field]: newValue });
-    }
+    setModalRow((prev) => (prev ? { ...prev, [field]: value } : prev));
   };
 
   return (
-    <>
+    <Box
+      sx={{
+        height: 600,
+        width: '100%',
+        '& .actions': {
+          color: 'text.secondary',
+        },
+      }}
+    >
       <Breadcrumbs aria-label="breadcrumb">
-        <Link color="inherit" href="/" onClick={() => navigate('/')}>
+        <Link
+          underline="hover"
+          color="inherit"
+          onClick={() => navigate('/')}
+        >
           Home
         </Link>
-        <Link color="inherit" href="#" onClick={() => navigate(location.pathname)}>
-          Drivers
-        </Link>
         <Link
-          color="text.primary"
-          href="/getting-started/installation/"
-          onClick={() => navigate('/getting-started/installation/')}
-          aria-current="page"
+          underline="hover"
+          color="inherit"
+          onClick={() => navigate(location.pathname)}
         >
-          DataGrid with Modal Editing
+          DataGrid Example
         </Link>
       </Breadcrumbs>
-      <Box sx={{ height: 400, width: '100%' }}>
-        <DataGrid
-          rows={rows}
-          columns={columns}
-          editMode="row"
-          rowModesModel={rowModesModel}
-          onRowModesModelChange={handleRowModesModelChange}
-          onRowEditStop={handleRowEditStop}
-          processRowUpdate={processRowUpdate}
-          slots={{
-            toolbar: EditToolbar,
-          }}
-          slotProps={{
-            toolbar: { setRows, setRowModesModel },
-          }}
-        />
-      </Box>
-      <Dialog open={openModal} onClose={() => setOpenModal(false)}>
-        <DialogTitle>Edit Driver</DialogTitle>
+
+      <DataGrid
+        rows={rows}
+        columns={columns}
+        editMode="row"
+        rowModesModel={rowModesModel}
+        onRowEditStop={handleRowEditStop}
+        processRowUpdate={processRowUpdate}
+        onRowModesModelChange={handleRowModesModelChange}
+        slots={{
+          toolbar: EditToolbar,
+        }}
+        slotProps={{
+          toolbar: { setRows, setRowModesModel },
+        }}
+      />
+
+      <Dialog open={openModal} onClose={() => setOpenModal(false)} maxWidth="md" fullWidth>
+        <DialogTitle>Edit Row</DialogTitle>
         <DialogContent>
-          <TextField
-            margin="dense"
-            label="Driver Name"
-            type="text"
-            fullWidth
-            value={modalRow?.drivername ?? ''}
-            onChange={(e) => handleModalChange('drivername', e.target.value)}
-          />
-          <TextField
-            margin="dense"
-            label="Mobile Number"
-            type="text"
-            fullWidth
-            value={modalRow?.mobile ?? ''}
-            onChange={(e) => handleModalChange('mobile', e.target.value)}
-          />
-          <TextField
-            margin="dense"
-            label="Aadhar Image"
-            type="text"
-            fullWidth
-            value={modalRow?.aadharImage ?? ''}
-            onChange={(e) => handleModalChange('aadharImage', e.target.value)}
-          />
-          <TextField
-            margin="dense"
-            label="Aadhar Name"
-            type="text"
-            fullWidth
-            value={modalRow?.aadharname ?? ''}
-            onChange={(e) => handleModalChange('aadharname', e.target.value)}
-          />
-          <TextField
-            margin="dense"
-            label="Join Date"
-            type="date"
-            fullWidth
-            value={modalRow?.joinDate?.toISOString().split('T')[0] ?? ''}
-            onChange={(e) => handleModalChange('joinDate', e.target.value)}
-          />
-          <TextField
-            margin="dense"
-            label="Status"
-            type="text"
-            fullWidth
-            value={modalRow?.status ?? ''}
-            onChange={(e) => handleModalChange('status', e.target.value)}
-          />
+          {modalRow && (
+            <>
+              <TextField
+                margin="dense"
+                label="Driver Name"
+                type="text"
+                fullWidth
+                variant="outlined"
+                value={modalRow.name}
+                onChange={(e) => handleModalChange('name', e.target.value)}
+              />
+              <TextField
+                margin="dense"
+                label="Mobile Number"
+                type="text"
+                fullWidth
+                variant="outlined"
+                value={modalRow.mobile}
+                onChange={(e) => handleModalChange('mobile', e.target.value)}
+              />
+              <TextField
+                margin="dense"
+                label="Aadhar Image"
+                type="text"
+                fullWidth
+                variant="outlined"
+                value={modalRow.avatar}
+                onChange={(e) => handleModalChange('avatar', e.target.value)}
+              />
+              <TextField
+                margin="dense"
+                label="Aadhar Name"
+                type="text"
+                fullWidth
+                variant="outlined"
+                value={modalRow.warename}
+                onChange={(e) => handleModalChange('warename', e.target.value)}
+              />
+              <TextField
+                margin="dense"
+                label="Warehouse"
+                type="text"
+                fullWidth
+                variant="outlined"
+                value={modalRow.warehouse}
+                onChange={(e) => handleModalChange('warehouse', e.target.value)}
+              />
+              <TextField
+                margin="dense"
+                label="Type"
+                type="text"
+                fullWidth
+                variant="outlined"
+                value={modalRow.typep}
+                onChange={(e) => handleModalChange('typep', e.target.value)}
+              />
+              <TextField
+                margin="dense"
+                label="Warehouse Address"
+                type="text"
+                fullWidth
+                variant="outlined"
+                value={modalRow.address}
+                onChange={(e) => handleModalChange('address', e.target.value)}
+              />
+            </>
+          )}
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpenModal(false)}>Cancel</Button>
-          <Button onClick={handleSaveClick}>Save</Button>
+          <Button onClick={handleSaveClick} color="primary">Save</Button>
         </DialogActions>
       </Dialog>
-    </>
+    </Box>
   );
 }

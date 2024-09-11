@@ -27,28 +27,21 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const UserRegistration = () => {
-  const form = useForm();
-  const {register} = form
-  const {name,ref,onChange,onBlur} = register('username')
+  const { register, handleSubmit } = useForm();
   const classes = useStyles();
   const [avatar, setAvatar] = useState('');
-  const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
 
   const handleAvatarChange = (event) => {
     setAvatar(URL.createObjectURL(event.target.files[0]));
   };
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-
+  const onSubmit = async (data) => {
     try {
       const formData = new FormData();
       formData.append('avatar', avatar);
-      formData.append('username', username);
-      formData.append('email', email);
-      formData.append('password', password);
+      formData.append('username', data.username);
+      formData.append('email', data.email);
+      formData.append('password', data.password);
 
       const response = await axios.post('https://api.example.com/register', formData, {
         headers: {
@@ -71,21 +64,17 @@ const UserRegistration = () => {
         <Typography component="h1" variant="h5">
           User Registration
         </Typography>
-        <form className={classes.form} onSubmit={handleSubmit}>
+        <form className={classes.form} onSubmit={handleSubmit(onSubmit)}>
           <TextField
             variant="outlined"
             margin="normal"
-            onBlur={onBlur}
-            ref={ref}
-            onChange={onChange}
             required
             fullWidth
             id="username"
             label="Username"
             name="username"
             autoFocus
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            {...register('username')}
           />
           <TextField
             variant="outlined"
@@ -96,8 +85,7 @@ const UserRegistration = () => {
             label="Email Address"
             type="email"
             id="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            {...register('email')}
           />
           <TextField
             variant="outlined"
@@ -108,8 +96,7 @@ const UserRegistration = () => {
             label="Password"
             type="password"
             id="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            {...register('password')}
           />
           <input
             accept="image/*"

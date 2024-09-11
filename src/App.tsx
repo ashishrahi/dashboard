@@ -8,11 +8,12 @@ import SignUp from './pages/Authentication/SignUp';
 import ECommerce from './pages/Dashboard/ECommerce';
 import Orders from './pages/Orders/Orders';
 
+
 import Warehouse from './pages/Warehouse/Warehouse';
 import Activewarehouse from './pages/Warehouse/ActiveWarehouse'
 import InactiveWarehouse from './pages/Warehouse/InactiveWarehouse'
 
-import Subcategory from './pages/Sub Category/SubCategory';
+import Subcategory from './components/Chat/ChatCard';
 import ActiveSubcategory from './pages/Sub Category/ActiveSubCategory'
 import InactiveSubcategory from './pages/Sub Category/InActiveSubcategory'
 
