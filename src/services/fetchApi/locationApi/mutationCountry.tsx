@@ -3,22 +3,21 @@ import api from '../../../utilities/Api';
 
 interface Country {
   id: number;
-  name: string;
-  email: string;
+  countryname: string;
 }
 
 interface NewCountry {
-  name: string;
-  email: string;
+  countryname: string;
 }
 
 // Fetch Countrys
-const fetchCountrys = async (): Promise<Country[]> => {
+const fetchCountries = async (): Promise<Country[]> => {
   try {
-    const response = await api.get('/Countrys');
+    const response = await api.get(`/countries`);
+    console.log(response.data)
     return response.data;
   } catch (error) {
-    console.log('Error fetching Countrys:', error);
+    console.log('Error fetching Countries:', error);
     throw error; // Rethrow the error for react-query to handle
   }
 };
@@ -35,9 +34,9 @@ const fetchCountryProfile = async (id: number): Promise<Country> => {
 };
 
 // Add Country
-const addCountry = async (newCountry: NewCountry): Promise<Country> => {
+const addCountry = async (countryname: NewCountry): Promise<Country> => {
   try {
-    const response = await api.post('/Countrys/Country', newCountry);
+    const response = await api.post('/countries/country', countryname);
     return response.data;
   } catch (error) {
     console.error('Error adding Country:', error);
@@ -48,7 +47,7 @@ const addCountry = async (newCountry: NewCountry): Promise<Country> => {
 // Delete Country
 const deleteCountry = async (id: number): Promise<void> => {
   try {
-    await api.delete(`/Countrys/${id}`);
+    await api.delete(`/countries/${id}`);
   } catch (error) {
     console.error('Error deleting Country:', error);
     throw error; 
@@ -56,9 +55,9 @@ const deleteCountry = async (id: number): Promise<void> => {
 };
 
 // Update Country
-const updateCountry = async (CountryData: Partial<Country>, id: number): Promise<Country> => {
+const updateCountry = async (countryname: Partial<Country>, id: number): Promise<Country> => {
   try {
-    const response = await api.patch(`/Countrys/${id}`, CountryData);
+    const response = await api.patch(`/countries/${id}`, countryname);
     return response.data;
   } catch (error) {
     console.error('Error updating Country:', error);
@@ -77,8 +76,8 @@ const updateCountryStatus = async (id: number): Promise<void> => {
 };
 
 // Fetching Countrys query
-export const useCountrysQuery = () => {
-  return useQuery<Country[]>('Countrys', fetchCountrys);
+export const useCountriesQuery = () => {
+  return useQuery<Country[]>('Countries', fetchCountries);
 };
 
 // Country profile mutation
@@ -100,7 +99,7 @@ export const useAddCountryMutation = () => {
   const queryClient = useQueryClient();
   return useMutation(addCountry, {
     onSuccess: () => {
-      queryClient.invalidateQueries('Countrys');
+      queryClient.invalidateQueries('Countries');
     },
     onError: (err: any) => {
       console.error('Error adding Country:', err);
@@ -128,7 +127,7 @@ export const useUpdateCountryMutation = () => {
   const queryClient = useQueryClient();
   return useMutation(updateCountry, {
     onSuccess: () => {
-      queryClient.invalidateQueries('Countrys');
+      queryClient.invalidateQueries('Countries');
     },
     onError: (err: any) => {
       console.error('Error updating Country:', err);
@@ -142,7 +141,7 @@ export const useUpdateCountryStatusMutation = () => {
   const queryClient = useQueryClient();
   return useMutation(updateCountryStatus, {
     onSuccess: () => {
-      queryClient.invalidateQueries('Countrys');
+      queryClient.invalidateQueries('Countries');
     },
     onError: (err: any) => {
       console.error('Error updating Country status:', err);

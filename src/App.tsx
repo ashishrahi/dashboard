@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Route, Routes, useLocation, Navigate } from 'react-router-dom';
-
+import { useSelector, UseSelector } from 'react-redux';
 
 import Loader from './common/Loader';
 import PageTitle from './components/PageTitle';
@@ -13,7 +13,7 @@ import Warehouse from './pages/Warehouse/Warehouse';
 import Activewarehouse from './pages/Warehouse/ActiveWarehouse'
 import InactiveWarehouse from './pages/Warehouse/InactiveWarehouse'
 
-import Subcategory from './components/Chat/ChatCard';
+import Subcategory from './pages/Sub Category/SubCategory';
 import ActiveSubcategory from './pages/Sub Category/ActiveSubCategory'
 import InactiveSubcategory from './pages/Sub Category/InActiveSubcategory'
 
@@ -44,15 +44,15 @@ import Today from '../src/pages/Collections/Today';
 
 import ContactUs from './pages/Contact Us/ContactUs';
 
-import Profile from './pages/Profile';
-import Settings from './pages/Settings';
+import Profile from './components/Profile';
+import Settings from './components/Settings';
 import SignIn from './pages/Authentication/SignIn';
 
 import FinanceDepartment from './pages/Finance Department/FinanceDepartment'
 import ActiveFinanceDepartment from './pages/Finance Department/ActiveFinanceDepart'
 import InactiveFinanceDepartment from './pages/Finance Department/InactiveFinanceDepart'
   // Location
-import Country from './pages/Locations/Country'
+import Country from './pages/Locations/Country/Country'
 import State from './pages/Locations/State'
 import City from './pages/Locations/City'
 import Pincode from './pages/Locations/Pincode'
@@ -71,7 +71,7 @@ import Scrapimpact from './pages/UserAppContent/ImpactScrap'
 function App() {
   const [loading, setLoading] = useState<boolean>(true);
   const { pathname } = useLocation();
-  const isAuthenticate = true; 
+  const isAuthenticate = useSelector((state)=>state.admin.isAuthenticated); 
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -99,7 +99,7 @@ function App() {
           <DefaultLayout>
             <Routes>
               {/* Dashboard */}
-              <Route index  element={<ProtectedRoute element={<><PageTitle title="eCommerce Dashboard" /> <ECommerce /></>} />} />
+              <Route index  element={<ProtectedRoute element={<><PageTitle title="Dashboard" /> <ECommerce /></>} />} />
 
             {/*Locations */}
              <Route path="/location/country" element={<ProtectedRoute element={<><PageTitle title="Country" /><Country /></>} />} />

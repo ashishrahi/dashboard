@@ -1,5 +1,5 @@
 import { Card } from '@mui/material';
-import '../Chart/Chart.scss'
+import './Chart.scss'
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 const data = [
   {

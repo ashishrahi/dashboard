@@ -1,10 +1,10 @@
 import React from 'react';
-import CardDataStats from '../../components/CardDataStats';
-import ChartOne from '../../components/Charts/ChartOne';
-import ChartThree from '../../components/Charts/ChartThree';
-import ChartTwo from '../../components/Charts/ChartTwo';
-import MapOne from '../../components/Maps/MapOne';
-import TableOne from '../../components/Tables/TableOne';
+import CardDataStats from '../../components/dataDisplay/CardDataStats';
+import ChartOne from '../../components/dataDisplay/Charts/ChartOne';
+import ChartThree from '../../components/dataDisplay/Charts/ChartThree';
+import ChartTwo from '../../components/dataDisplay/Charts/ChartTwo';
+import MapOne from '../../components/dataDisplay/Maps/MapOne';
+import TableOne from '../../components/dataDisplay/Tables';
 
 const ECommerce: React.FC = () => {
   return (

@@ -5,11 +5,10 @@ import api from '../utilities/Api';
 
 interface Admin {
   id: string;
-  name: string;
   email: string;
 }
 
-interface AuthState {
+interface AdminState {
   admin: Admin | null;
   isAuthenticated: boolean;
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
@@ -19,7 +18,7 @@ interface AuthState {
 }
 
 // Define the initial state
-const initialState: AuthState = {
+const initialState: AdminState = {
   admin: JSON.parse(localStorage.getItem('admin') || 'null'),
   isAuthenticated: !!localStorage.getItem('token'),
   status: 'idle',
@@ -31,10 +30,11 @@ const initialState: AuthState = {
 // Async thunk for registration
 
 export const registerAdmin = createAsyncThunk<Admin, Admin, { rejectValue: string }>(
-  'auth/registerAdmin',
+  'admin/registerAdmin',
   async (adminData, { rejectWithValue }) => {
     try {
-      const response = await api.post('/auth/register', adminData);
+      const response = await api.post('/admin/register', adminData);
+      console.log
       window.location.replace('/login');
       return response.data;
     } catch (error) {
@@ -45,10 +45,12 @@ export const registerAdmin = createAsyncThunk<Admin, Admin, { rejectValue: strin
 
 // Async thunk for login
 export const loginAdmin = createAsyncThunk<{ admin: Admin; token: string; tokenExpiresAt: string }, Admin, { rejectValue: string }>(
-  'auth/loginAdmin',
-  async (adminData, { rejectWithValue }) => {
+  'admin/loginAdmin',
+  async (values, { rejectWithValue }) => {
     try {
-      const response = await api.post('/auth/login', adminData);
+      const response = await api.post('/admin/signin', values);
+      console.log(values)
+
       window.location.replace('/');
       return response.data;
     } catch (error) {
@@ -59,10 +61,10 @@ export const loginAdmin = createAsyncThunk<{ admin: Admin; token: string; tokenE
 
 // Async thunk for logout
 export const logout = createAsyncThunk<void, void, { rejectValue: string }>(
-  'auth/logout',
+  'admin/signout',
   async (_, { rejectWithValue }) => {
     try {
-      await api.get('/auth/logout');
+      await api.get('/admin/signout');
     } catch (error) {
       return rejectWithValue(error.response?.data || 'An error occurred');
     }

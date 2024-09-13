@@ -1,8 +1,8 @@
 import React from 'react';
-import Breadcrumb from '../components/Breadcrumbs/Breadcrumb';
-import ChartOne from '../components/Charts/ChartOne';
-import ChartThree from '../components/Charts/ChartThree';
-import ChartTwo from '../components/Charts/ChartTwo';
+import Breadcrumb from './Navigation/Breadcrumbs/Breadcrumb';
+import ChartOne from './dataDisplay/Charts/ChartOne';
+import ChartThree from './dataDisplay/Charts/ChartThree';
+import ChartTwo from './dataDisplay/Charts/ChartTwo';
 
 const Chart: React.FC = () => {
   return (
