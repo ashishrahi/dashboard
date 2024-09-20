@@ -6,8 +6,8 @@ import Alert from '@mui/material/Alert';
 import {CircularProgress,Snackbar} from '../../../components/feedBack/feedBack';
 import {Chip} from '../../../components/dataDisplay/dataDisplay';
 import { Avatar, Breadcrumbs, Link as MuiLink, Container, Menu, MenuItem, IconButton, Tooltip } from '@mui/material';
-import AddCountryModal from './addCountry'
-import UpdateCountryModal from './updateCountry';
+import AddCountryModal from './addState'
+import UpdateCountryModal from './updateState';
 
 import {
   GridRowModes,
@@ -39,56 +39,10 @@ interface Row {
   status?: boolean;
   image?: string;
   categoryname?: string;
-  variantdetails?: {
-    color: string;
-    dandi: string;
-    gender: string;
-    purity: string;
-    kunda: string;
-    size: string;
-    weight: string;
-    gaugesize: string;
-    status: boolean;
-  };
+
 }
 
-const initialRows: Row[] = [
-  {
-    id: randomId(),
-    name: randomTraderName(),
-    age: 25,
-    joinDate: randomCreatedDate(),
-    role: randomRole(),
-  },
-  {
-    id: randomId(),
-    name: randomTraderName(),
-    age: 36,
-    joinDate: randomCreatedDate(),
-    role: randomRole(),
-  },
-  {
-    id: randomId(),
-    name: randomTraderName(),
-    age: 19,
-    joinDate: randomCreatedDate(),
-    role: randomRole(),
-  },
-  {
-    id: randomId(),
-    name: randomTraderName(),
-    age: 28,
-    joinDate: randomCreatedDate(),
-    role: randomRole(),
-  },
-  {
-    id: randomId(),
-    name: randomTraderName(),
-    age: 23,
-    joinDate: randomCreatedDate(),
-    role: randomRole(),
-  },
-];
+
 
 interface EditToolbarProps {
   setRows: React.Dispatch<React.SetStateAction<Row[]>>;
@@ -112,7 +66,7 @@ function EditToolbar(props: EditToolbarProps) {
 
   return (
     <GridToolbarContainer>
-        <Button color="primary" startIcon={<AddIcon />} onClick={handleOpen} label='Add Country'>
+        <Button color="primary" startIcon={<AddIcon />} onClick={handleOpen} label='Add State'>
         </Button>
         <AddCountryModal open={open} onClose={handleClose}/>
     </GridToolbarContainer>

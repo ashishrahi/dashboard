@@ -4,13 +4,14 @@ import api from '../../../utilities/Api';
 interface Country {
   id: number;
   countryname: string;
-}
+  }
 
 interface NewCountry {
   countryname: string;
 }
 
-// Fetch Countrys
+///////////////////////////////  Fetch Countries ///////////////////////////////////////////////////////////
+
 const fetchCountries = async (): Promise<Country[]> => {
   try {
     const response = await api.get(`/countries`);
@@ -22,10 +23,12 @@ const fetchCountries = async (): Promise<Country[]> => {
   }
 };
 
-// Fetch Country profile by ID
-const fetchCountryProfile = async (id: number): Promise<Country> => {
+////////////////////////////////// Fetch Country by ID //////////////////////////////////////////////////////////////////
+
+const fetchCountryById= async (id: number): Promise<Country> => {
   try {
-    const response = await api.get(`/Countrys/${id}`);
+    console.log(id)
+    const response = await api.get(`/countries/${id}`);
     return response.data;
   } catch (error) {
     console.log('Error fetching Country profile:', error);
@@ -33,7 +36,8 @@ const fetchCountryProfile = async (id: number): Promise<Country> => {
   }
 };
 
-// Add Country
+///////////////////////////////////// Add Country //////////////////////////////////////////////////////////
+
 const addCountry = async (countryname: NewCountry): Promise<Country> => {
   try {
     const response = await api.post('/countries/country', countryname);
@@ -44,7 +48,8 @@ const addCountry = async (countryname: NewCountry): Promise<Country> => {
   }
 };
 
-// Delete Country
+//////////////////////////////////  Delete Country  //////////////////////////////////////////////////////////////////
+
 const deleteCountry = async (id: number): Promise<void> => {
   try {
     await api.delete(`/countries/${id}`);
@@ -54,10 +59,12 @@ const deleteCountry = async (id: number): Promise<void> => {
   }
 };
 
-// Update Country
+///////////////////////////////////  Update Country //////////////////////////////////////////////////////////////////
+
 const updateCountry = async (countryname: Partial<Country>, id: number): Promise<Country> => {
   try {
-    const response = await api.patch(`/countries/${id}`, countryname);
+    
+    const response = await api.put(`/countries/${id}`, countryname);
     return response.data;
   } catch (error) {
     console.error('Error updating Country:', error);
@@ -65,27 +72,30 @@ const updateCountry = async (countryname: Partial<Country>, id: number): Promise
   }
 };
 
-// Update Country status
+///////////////////////////////// Update Country status ////////////////////////////////////////////////////////////////
+
 const updateCountryStatus = async (id: number): Promise<void> => {
   try {
-    await api.put(`/Countrys/${id}/status`);
+    await api.put(`/countries/${id}/status`);
   } catch (error) {
     console.error('Error updating Country status:', error);
     throw error; 
   }
 };
 
-// Fetching Countrys query
+/////////////////////////////  Mutation Countries  //////////////////////////////////////////////////////////
+
 export const useCountriesQuery = () => {
-  return useQuery<Country[]>('Countries', fetchCountries);
+  return useQuery<Country[]>('countries', fetchCountries);
 };
 
-// Country profile mutation
-export const useCountryProfileMutation = () => {
+/////////////////////////////////  Country Id mutation //////////////////////////////////////////////////
+
+export const useCountryByIdMutation = () => {
   const queryClient = useQueryClient();
-  return useMutation(fetchCountryProfile, {
+  return useMutation(fetchCountryById, {
     onSuccess: () => {
-      queryClient.invalidateQueries('Countrys');
+      queryClient.invalidateQueries('countries');
     },
     onError: (err: any) => {
       console.error('Error fetching Country profile:', err);
@@ -94,12 +104,13 @@ export const useCountryProfileMutation = () => {
   });
 };
 
-// Add Country mutation
+////////////////////////////////// Add Country mutation //////////////////////////////////////////////////////////////////
+
 export const useAddCountryMutation = () => {
   const queryClient = useQueryClient();
   return useMutation(addCountry, {
     onSuccess: () => {
-      queryClient.invalidateQueries('Countries');
+      queryClient.invalidateQueries('countries');
     },
     onError: (err: any) => {
       console.error('Error adding Country:', err);
@@ -108,12 +119,13 @@ export const useAddCountryMutation = () => {
   });
 };
 
-// Delete Country mutation
+//////////////////////////////////  Delete Country mutation //////////////////////////////////////////////////////////////////
+
 export const useDeleteCountryMutation = () => {
   const queryClient = useQueryClient();
   return useMutation(deleteCountry, {
     onSuccess: () => {
-      queryClient.invalidateQueries('Countrys');
+      queryClient.invalidateQueries('countries');
     },
     onError: (err: any) => {
       console.error('Error deleting Country:', err);
@@ -122,12 +134,13 @@ export const useDeleteCountryMutation = () => {
   });
 };
 
-// Update Country mutation
+///////////////////////////////////  Update Country mutation //////////////////////////////////////////////////////////////////
+
 export const useUpdateCountryMutation = () => {
   const queryClient = useQueryClient();
   return useMutation(updateCountry, {
     onSuccess: () => {
-      queryClient.invalidateQueries('Countries');
+      queryClient.invalidateQueries('countries');
     },
     onError: (err: any) => {
       console.error('Error updating Country:', err);
@@ -136,12 +149,13 @@ export const useUpdateCountryMutation = () => {
   });
 };
 
-// Update Country status mutation
+////////////////////////////////  Update Country status mutation //////////////////////////////////////////////////////////////////
+
 export const useUpdateCountryStatusMutation = () => {
   const queryClient = useQueryClient();
   return useMutation(updateCountryStatus, {
     onSuccess: () => {
-      queryClient.invalidateQueries('Countries');
+      queryClient.invalidateQueries('countries');
     },
     onError: (err: any) => {
       console.error('Error updating Country status:', err);

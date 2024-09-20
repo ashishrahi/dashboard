@@ -53,9 +53,9 @@ import ActiveFinanceDepartment from './pages/Finance Department/ActiveFinanceDep
 import InactiveFinanceDepartment from './pages/Finance Department/InactiveFinanceDepart'
   // Location
 import Country from './pages/Locations/Country/Country'
-import State from './pages/Locations/State'
-import City from './pages/Locations/City'
-import Pincode from './pages/Locations/Pincode'
+import State from './pages/Locations/State/State'
+import City from './pages/Locations/City/City'
+import Pincode from './pages/Locations/Pincode/Pincode'
 
 // User App Component
 import About from './pages/UserAppContent/Aboutus'

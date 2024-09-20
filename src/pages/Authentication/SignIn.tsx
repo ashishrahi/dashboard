@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import Breadcrumb from '../../components/Navigation/Breadcrumbs/Breadcrumb';
-import LogoDark from '../../images/logo/logo-dark.svg';
-import Logo from '../../images/logo/logo.svg';
 import { useDispatch } from 'react-redux';
 import { loginAdmin } from '../../store/adminSlice';
-import { Eye, EyeOff } from 'react-feather'; // Importing Feather icons for visibility toggle
+import { Eye, EyeOff } from 'react-feather';
+import LogoDark from '../../images/logo/logo-dark.svg'
+import Logo from '../../images/logo/logo.svg';
+import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google'; // Google OAuth
 
 const SignIn: React.FC = () => {
   const dispatch = useDispatch();
@@ -32,14 +32,26 @@ const SignIn: React.FC = () => {
     setShowPassword((prev) => !prev);
   };
 
+  const handleGoogleLoginSuccess = (response: any) => {
+    const token = response.credential;
+    console.log('Google token:', token);
+    // Send the token to your backend for further authentication and verification
+    dispatch(loginAdmin({ token }));
+  };
+
+  const handleGoogleLoginFailure = (error: any) => {
+    console.error('Google Login failed:', error);
+  };
+
   return (
-    <>
+    <GoogleOAuthProvider clientId="YOUR_GOOGLE_CLIENT_ID">
       <Breadcrumb pageName="Sign In" />
 
       <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
         <div className="flex flex-wrap items-center">
           <div className="hidden w-full xl:block xl:w-1/2">
             <div className="py-17.5 px-26 text-center">
+              {/* Logo */}
               <div className="mb-5.5 inline-block">
                 <img className="hidden dark:block" src={LogoDark} alt="Logo" />
                 <img className="dark:hidden" src={Logo} alt="Logo" />
@@ -47,11 +59,9 @@ const SignIn: React.FC = () => {
               <p className="2xl:px-20">
                 Lorem ipsum dolor sit amet, consectetur adipiscing elit suspendisse.
               </p>
-              <span className="mt-15 inline-block">
-                {/* SVG illustration here */}
-              </span>
             </div>
           </div>
+
           <div className="w-full xl:w-1/2 p-10">
             <div className="text-center mb-7">
               <h2 className="text-2xl font-semibold mb-1">Sign In</h2>
@@ -65,13 +75,11 @@ const SignIn: React.FC = () => {
                 </label>
                 <input
                   type="email"
-                  placeholder='admin@admin.com'
+                  placeholder="admin@admin.com"
                   id="email"
                   name="email"
                   className={`w-full rounded-md border ${
-                    formik.touched.email && formik.errors.email
-                      ? 'border-red-500'
-                      : 'border-gray-300'
+                    formik.touched.email && formik.errors.email ? 'border-red-500' : 'border-gray-300'
                   } px-3 py-2 focus:border-indigo-500 focus:ring-indigo-500`}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
@@ -87,14 +95,12 @@ const SignIn: React.FC = () => {
                   Password
                 </label>
                 <input
-                  placeholder='password'
+                  placeholder="password"
                   type={showPassword ? 'text' : 'password'}
                   id="password"
                   name="password"
                   className={`w-full rounded-md border ${
-                    formik.touched.password && formik.errors.password
-                      ? 'border-red-500'
-                      : 'border-gray-300'
+                    formik.touched.password && formik.errors.password ? 'border-red-500' : 'border-gray-300'
                   } px-3 py-2 pr-10 focus:border-indigo-500 focus:ring-indigo-500`}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
@@ -112,45 +118,28 @@ const SignIn: React.FC = () => {
                 ) : null}
               </div>
 
-              <div className="flex items-center justify-between mb-5">
-                <div className="flex items-center">
-                  {/* <input
-                    id="rememberMe"
-                    name="rememberMe"
-                    type="checkbox"
-                    className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                    checked={formik.values.rememberMe}
-                  /> */}
-                  {/* <label htmlFor="rememberMe" className="ml-2 block text-sm text-gray-900">
-                    Remember me
-                  </label> */}
-                </div>
-                {/* <div className="text-sm">
-                  <Link to="/forgot-password" className="text-indigo-600 hover:text-indigo-500">
-                    Forgot your password?
-                  </Link>
-                </div> */}
-              </div>
-
               <button
                 type="submit"
                 className="w-full bg-indigo-600 text-white py-2 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
               >
                 Sign In
               </button>
-              <p className="mt-5 text-center text-sm text-gray-600">
-                Don't have an account?{' '}
-                <Link to="/signup" className="text-indigo-600 hover:text-indigo-500">
-                  Sign up
-                </Link>
-              </p>
+
+              <div className="text-center my-5">Or</div>
+
+              <GoogleLogin
+                onSuccess={handleGoogleLoginSuccess}
+                onError={handleGoogleLoginFailure}
+                shape="rectangular"
+                theme="outline"
+                text="signin_with"
+                width="100%"
+              />
             </form>
           </div>
         </div>
       </div>
-    </>
+    </GoogleOAuthProvider>
   );
 };
 
