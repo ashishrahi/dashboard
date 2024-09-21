@@ -23,7 +23,7 @@ import {
   randomId,
   randomArrayItem,
 } from '@mui/x-data-grid-generator';
-import { useCountriesQuery, useUpdateCountryStatusMutation } from '../../../services/fetchApi/locationApi/mutationCountry';
+import { useCountry, useStatusMutationCountry } from '../../../services/fetchApi/locationApi/mutationCountry';
 
 const roles = ['Market', 'Finance', 'Development'];
 const randomRole = () => randomArrayItem(roles);
@@ -85,7 +85,7 @@ export default function FullFeaturedCrudGrid() {
   const [page, setPage] = React.useState<number>(0);
   const [menuAnchorEl, setMenuAnchorEl] = React.useState<null | HTMLElement>(null);
   const [currentRowId, setCurrentRowId] = React.useState<string | null>(null);
-  const { mutateAsync: statusMutation } = useUpdateCountryStatusMutation();
+  const { mutateAsync: statusMutation } = useUpdateCountryStatus();
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);

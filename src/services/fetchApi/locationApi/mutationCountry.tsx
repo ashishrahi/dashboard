@@ -1,165 +1,153 @@
 import { useQuery, useQueryClient, useMutation } from 'react-query';
 import api from '../../../utilities/Api';
+import { useNavigate } from 'react-router-dom';
 
+// Define types for your data
 interface Country {
-  id: number;
-  countryname: string;
-  }
-
-interface NewCountry {
-  countryname: string;
+  id: string;
+countryname:string;
 }
 
-///////////////////////////////  Fetch Countries ///////////////////////////////////////////////////////////
+interface AddCountryFormData {
+  // Define properties required for adding a Country
+}
+
+////////////////////////////fetch Countries //////////////////
 
 const fetchCountries = async (): Promise<Country[]> => {
   try {
-    const response = await api.get(`/countries`);
-    console.log(response.data)
+    const response = await api.get('/countries');
     return response.data;
   } catch (error) {
-    console.log('Error fetching Countries:', error);
-    throw error; // Rethrow the error for react-query to handle
+    console.error('Error fetching countries:', error);
+    throw error; // Rethrow to ensure the query fails
   }
 };
 
-////////////////////////////////// Fetch Country by ID //////////////////////////////////////////////////////////////////
+//------------- Country by Id
 
-const fetchCountryById= async (id: number): Promise<Country> => {
+const fetchCountryById = async (id: string): Promise<Country> => {
   try {
-    console.log(id)
     const response = await api.get(`/countries/${id}`);
     return response.data;
   } catch (error) {
-    console.log('Error fetching Country profile:', error);
-    throw error; 
+    console.error('Error fetching Countries by ID:', error);
+    throw error; // Rethrow to ensure the query fails
   }
 };
 
-///////////////////////////////////// Add Country //////////////////////////////////////////////////////////
+///////////////////////////// add Countries ////////////////////////////////
 
-const addCountry = async (countryname: NewCountry): Promise<Country> => {
+const addCountry = async (countryname: AddCountryFormData): Promise<Country> => {
   try {
     const response = await api.post('/countries/country', countryname);
     return response.data;
   } catch (error) {
-    console.error('Error adding Country:', error);
-    throw error; 
+    console.error('Error adding country:', error);
+    throw error; // Rethrow to ensure the mutation fails
   }
 };
 
-//////////////////////////////////  Delete Country  //////////////////////////////////////////////////////////////////
+//////////////////////// fetching of delete Countries /////////////////////////////////
 
-const deleteCountry = async (id: number): Promise<void> => {
+const deleteCountry = async (id: string): Promise<void> => {
   try {
     await api.delete(`/countries/${id}`);
   } catch (error) {
-    console.error('Error deleting Country:', error);
-    throw error; 
+    console.error('Error deleting country:', error);
+    throw error; // Rethrow to ensure the mutation fails
   }
 };
 
-///////////////////////////////////  Update Country //////////////////////////////////////////////////////////////////
+///////////////////////  update of Countries ///////////////////////////////
 
-const updateCountry = async (countryname: Partial<Country>, id: number): Promise<Country> => {
+const updateCountry = async ({ id, values }: { id: string; countryname: AddCountryFormData }): Promise<Karigar> => {
   try {
-    
-    const response = await api.put(`/countries/${id}`, countryname);
+    console.log(values);
+    const response = await api.put(`/countries/${id}`, values);
     return response.data;
   } catch (error) {
-    console.error('Error updating Country:', error);
-    throw error; 
+    console.error('Error updating countries:', error);
+    throw error; // Rethrow to ensure the mutation fails
   }
 };
 
-///////////////////////////////// Update Country status ////////////////////////////////////////////////////////////////
+/////////////////////// fetching of Status of Countries ///////////////////////////////
 
-const updateCountryStatus = async (id: number): Promise<void> => {
+const statusCountry = async (id: string): Promise<void> => {
   try {
     await api.put(`/countries/${id}/status`);
   } catch (error) {
-    console.error('Error updating Country status:', error);
-    throw error; 
+    console.error('Error updating country status:', error);
+    throw error; // Rethrow to ensure the mutation fails
   }
 };
 
-/////////////////////////////  Mutation Countries  //////////////////////////////////////////////////////////
+////////////////////////// fetching countries mutations /////////////////////////////////////
 
-export const useCountriesQuery = () => {
-  return useQuery<Country[]>('countries', fetchCountries);
+export const useCountry = () => {
+  return useQuery<Country[], Error>('countries', fetchCountries);
 };
 
-/////////////////////////////////  Country Id mutation //////////////////////////////////////////////////
+//--------------- Mutation to get Country by ID
 
-export const useCountryByIdMutation = () => {
-  const queryClient = useQueryClient();
-  return useMutation(fetchCountryById, {
-    onSuccess: () => {
-      queryClient.invalidateQueries('countries');
-    },
-    onError: (err: any) => {
-      console.error('Error fetching Country profile:', err);
-      alert('Failed to fetch Country profile. Please try again later.');
-    }
+export const useCountryById = (id: string) => {
+  return useQuery<Country, Error>(['countries', id], () => fetchCountryById(id), {
+    enabled: !!id, // Ensure the query is only enabled if there's an id
   });
 };
 
-////////////////////////////////// Add Country mutation //////////////////////////////////////////////////////////////////
+//--------------- Add country Mutations
 
 export const useAddCountryMutation = () => {
   const queryClient = useQueryClient();
-  return useMutation(addCountry, {
+  return useMutation<Country, Error, AddCountryFormData>(addCountry, {
     onSuccess: () => {
       queryClient.invalidateQueries('countries');
     },
-    onError: (err: any) => {
-      console.error('Error adding Country:', err);
-      alert('Failed to add Country. Please try again later.');
-    }
+    onError: (err) => {
+      console.error('Error adding country:', err);
+      alert('Failed to add country. Please try again later.');
+    },
   });
 };
 
-//////////////////////////////////  Delete Country mutation //////////////////////////////////////////////////////////////////
+/////////////////////////// delete country Mutations /////////////////////////////////
 
-export const useDeleteCountryMutation = () => {
+export const useDeleteMutationCountry = () => {
   const queryClient = useQueryClient();
-  return useMutation(deleteCountry, {
+  return useMutation<void, Error, string>(deleteCountry, {
     onSuccess: () => {
       queryClient.invalidateQueries('countries');
     },
-    onError: (err: any) => {
-      console.error('Error deleting Country:', err);
-      alert('Failed to delete Country. Please try again later.');
-    }
+    onError: (err) => {
+      console.error('Error deleting country:', err);
+      alert('Failed to delete country. Please try again later.');
+    },
   });
 };
 
-///////////////////////////////////  Update Country mutation //////////////////////////////////////////////////////////////////
+////////////////////////////// update Country Mutations ///////////////////////////////
 
-export const useUpdateCountryMutation = () => {
+export const useUpdateMutationCountry = () => {
   const queryClient = useQueryClient();
-  return useMutation(updateCountry, {
+
+  return useMutation<Country, Error, { id: string; formData: AddCountryFormData }>(updateCountry, {
     onSuccess: () => {
       queryClient.invalidateQueries('countries');
     },
-    onError: (err: any) => {
-      console.error('Error updating Country:', err);
-      alert('Failed to update Country. Please try again later.');
-    }
   });
 };
 
-////////////////////////////////  Update Country status mutation //////////////////////////////////////////////////////////////////
-
-export const useUpdateCountryStatusMutation = () => {
+export const useStatusMutationCountry = () => {
   const queryClient = useQueryClient();
-  return useMutation(updateCountryStatus, {
+  return useMutation<void, Error, string>(statusCountry, {
     onSuccess: () => {
       queryClient.invalidateQueries('countries');
     },
-    onError: (err: any) => {
-      console.error('Error updating Country status:', err);
-      alert('Failed to update Country status. Please try again later.');
-    }
+    onError: (err) => {
+      console.error('Error updating country status:', err);
+      alert('Failed to update country status. Please try again later.');
+    },
   });
 };

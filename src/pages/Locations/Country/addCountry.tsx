@@ -84,7 +84,7 @@ const AddCountryModal: React.FC<AddCountryModalProps> = ({ open, onClose, onAdd 
           <form onSubmit={formik.handleSubmit}>
             <TextField
               margin="dense"
-              label="Country Name"
+              label="Country Name*"
               type="text"
               fullWidth
               variant="outlined"
@@ -95,7 +95,7 @@ const AddCountryModal: React.FC<AddCountryModalProps> = ({ open, onClose, onAdd 
           </form>
         </DialogContent>
         <DialogActions>
-          <Button type="submit" color="success" onClick={() => formik.handleSubmit()} label='Add'/>
+          <Button type="submit" color="success" variant='outlined' onClick={() => formik.handleSubmit()} label='Add'/>
         </DialogActions>
       </Dialog>
 
@@ -103,8 +103,9 @@ const AddCountryModal: React.FC<AddCountryModalProps> = ({ open, onClose, onAdd 
         open={snackbarOpen}
         autoHideDuration={6000}
         onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }} // Set position to bottom-right
       >
-        <Alert onClose={handleSnackbarClose} severity={snackbarSeverity}>
+        <Alert onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{marginTop:'24%'}}>
           {snackbarMessage}
         </Alert>
       </Snackbar>

@@ -6,7 +6,7 @@ import { Close } from '@mui/icons-material';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { SxProps, Theme } from '@mui/material/styles';
-import {useUpdateCountryMutation,useCountryByIdMutation} from '../../../services/fetchApi/locationApi/mutationCountry'
+import {useUpdateMutationCountry,useCountryById} from '../../../services/fetchApi/locationApi/mutationCountry'
 
 
 interface UpdateCountryModalProps {
@@ -33,8 +33,8 @@ const dialogContentStyle: SxProps<Theme> = {
 };
 
 const UpdateCountryModal: React.FC<UpdateCountryModalProps> = ({ open, onClose,id }) => {
- const {mutateAsync:updateCountry} = useUpdateCountryMutation()
- const {data} = useCountryByIdMutation(id)
+ const {mutateAsync:updateCountry} = useUpdateCountry()
+ const {data} = useCountryById(id)
    console.log(data) 
 
 

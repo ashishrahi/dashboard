@@ -1,25 +1,26 @@
 import React from 'react';
-import { Button, TextField, IconButton } from '../../../components/Input/Input';
+import { Button, TextField, IconButton,Autocomplete  } from '../../../components/Input/Input';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Snackbar, Alert } from '@mui/material';
 import { Close } from '@mui/icons-material';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { SxProps, Theme } from '@mui/material/styles';
-import { useAddCountryMutation } from '../../../services/fetchApi/locationApi/mutationCountry';
+import { useAddCountry } from '../../../services/fetchApi/locationApi/mutationCountry';
 
 interface AddCountryModalProps {
   open: boolean;
   onClose: () => void;
-  onAdd: (newCountry: { countryname: string }) => void;
+  onAdd: (newCountry: { countryname: string; state: string }) => void;
 }
 
 const validationSchema = Yup.object({
   countryname: Yup.string().required('Country name is required*'),
+  state: Yup.string().required('State is required*'),
 });
 
 const modalStyle: SxProps<Theme> = {
   width: '500px',
-  height: '300px',
+  height: '350px',
   backgroundColor: '#f0f0f0',
   padding: '16px',
 };
@@ -28,6 +29,13 @@ const dialogContentStyle: SxProps<Theme> = {
   backgroundColor: '#e0e0e0',
   padding: '16px',
 };
+
+const countries = [
+  { label: 'United States' },
+  { label: 'Canada' },
+  { label: 'Mexico' },
+  // Add more countries as needed
+];
 
 const AddCountryModal: React.FC<AddCountryModalProps> = ({ open, onClose, onAdd }) => {
   const { mutateAsync: addCountry } = useAddCountryMutation();
@@ -38,6 +46,7 @@ const AddCountryModal: React.FC<AddCountryModalProps> = ({ open, onClose, onAdd 
   const formik = useFormik({
     initialValues: {
       countryname: '',
+      state: '',
     },
     validationSchema,
     onSubmit: async (values) => {
@@ -45,7 +54,7 @@ const AddCountryModal: React.FC<AddCountryModalProps> = ({ open, onClose, onAdd 
       try {
         await addCountry(values);
         formik.resetForm(); // Reset the form fields after successful submission
-        setSnackbarMessage('Country added successfully!');
+        setSnackbarMessage('Country and state added successfully!');
         setSnackbarSeverity('success');
         setSnackbarOpen(true);
         onClose();
@@ -71,7 +80,7 @@ const AddCountryModal: React.FC<AddCountryModalProps> = ({ open, onClose, onAdd 
         PaperProps={{ sx: modalStyle }}
       >
         <DialogTitle>
-          Add New Country
+          Add New Country and State
           <IconButton 
             aria-label="close" 
             onClick={onClose} 
@@ -82,20 +91,39 @@ const AddCountryModal: React.FC<AddCountryModalProps> = ({ open, onClose, onAdd 
         </DialogTitle>
         <DialogContent sx={dialogContentStyle}>
           <form onSubmit={formik.handleSubmit}>
+            {/* Autocomplete for Country */}
+            <Autocomplete
+              options={countries}
+              getOptionLabel={(option) => option.label}
+              fullWidth
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Country"
+                  margin="dense"
+                  variant="outlined"
+                  error={formik.touched.countryname && Boolean(formik.errors.countryname)}
+                  helperText={formik.touched.countryname && formik.errors.countryname}
+                  {...formik.getFieldProps('countryname')}
+                />
+              )}
+            />
+
+            {/* Text field for State */}
             <TextField
               margin="dense"
-              label="Country Name"
+              label="State"
               type="text"
               fullWidth
               variant="outlined"
-              {...formik.getFieldProps('countryname')}
-              error={formik.touched.countryname && Boolean(formik.errors.countryname)}
-              helperText={formik.touched.countryname && formik.errors.countryname}
+              {...formik.getFieldProps('state')}
+              error={formik.touched.state && Boolean(formik.errors.state)}
+              helperText={formik.touched.state && formik.errors.state}
             />
           </form>
         </DialogContent>
         <DialogActions>
-          <Button type="submit" color="success" onClick={() => formik.handleSubmit()} label='Add'/>
+          <Button type="submit" color="success" onClick={() => formik.handleSubmit()} label="Add" />
         </DialogActions>
       </Dialog>
 
