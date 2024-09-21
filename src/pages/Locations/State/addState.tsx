@@ -1,26 +1,26 @@
 import React from 'react';
-import { Button, TextField, IconButton,Autocomplete  } from '../../../components/Input/Input';
+import { Button, TextField, IconButton, Autocomplete } from '../../../components/Input/Input';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Snackbar, Alert } from '@mui/material';
 import { Close } from '@mui/icons-material';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { SxProps, Theme } from '@mui/material/styles';
-import { useAddCountry } from '../../../services/fetchApi/locationApi/mutationCountry';
+import { useAddStateMutation } from '../../../services/Api/location/mutationState';
 
-interface AddCountryModalProps {
+interface AddStateModalProps {
   open: boolean;
   onClose: () => void;
-  onAdd: (newCountry: { countryname: string; state: string }) => void;
+  onAdd: (newState: { statename: string; countryname: string }) => void;
 }
 
 const validationSchema = Yup.object({
+  statename: Yup.string().required('State name is required*'),
   countryname: Yup.string().required('Country name is required*'),
-  state: Yup.string().required('State is required*'),
 });
 
 const modalStyle: SxProps<Theme> = {
   width: '500px',
-  height: '350px',
+  height: '300px',
   backgroundColor: '#f0f0f0',
   padding: '16px',
 };
@@ -30,37 +30,33 @@ const dialogContentStyle: SxProps<Theme> = {
   padding: '16px',
 };
 
-const countries = [
-  { label: 'United States' },
-  { label: 'Canada' },
-  { label: 'Mexico' },
-  // Add more countries as needed
-];
+// Dummy list of countries for autocomplete
+const countries = ['United States', 'Canada', 'Mexico', 'United Kingdom', 'Germany', 'France', 'India'];
 
-const AddCountryModal: React.FC<AddCountryModalProps> = ({ open, onClose, onAdd }) => {
-  const { mutateAsync: addCountry } = useAddCountryMutation();
+const AddCountryModal: React.FC<AddStateModalProps> = ({ open, onClose, onAdd }) => {
+  const { mutateAsync: addState } = useAddStateMutation();
   const [snackbarOpen, setSnackbarOpen] = React.useState(false);
   const [snackbarMessage, setSnackbarMessage] = React.useState('');
   const [snackbarSeverity, setSnackbarSeverity] = React.useState<'success' | 'error'>('success');
 
   const formik = useFormik({
     initialValues: {
-      countryname: '',
-      state: '',
+      statename: '',
+      countryname: '', // Adding countryname to form state
     },
     validationSchema,
     onSubmit: async (values) => {
       console.log('Submitting form with values:', values); // Debug log
       try {
-        await addCountry(values);
+        await addState(values);
         formik.resetForm(); // Reset the form fields after successful submission
-        setSnackbarMessage('Country and state added successfully!');
+        setSnackbarMessage('State added successfully!');
         setSnackbarSeverity('success');
         setSnackbarOpen(true);
         onClose();
       } catch (error) {
-        console.error('Failed to add country:', error); // Debug log
-        setSnackbarMessage('Failed to add country. Please try again.');
+        console.error('Failed to add State:', error); // Debug log
+        setSnackbarMessage('Failed to add State. Please try again.');
         setSnackbarSeverity('error');
         setSnackbarOpen(true);
       }
@@ -80,7 +76,7 @@ const AddCountryModal: React.FC<AddCountryModalProps> = ({ open, onClose, onAdd 
         PaperProps={{ sx: modalStyle }}
       >
         <DialogTitle>
-          Add New Country and State
+          Add New State
           <IconButton 
             aria-label="close" 
             onClick={onClose} 
@@ -91,39 +87,38 @@ const AddCountryModal: React.FC<AddCountryModalProps> = ({ open, onClose, onAdd 
         </DialogTitle>
         <DialogContent sx={dialogContentStyle}>
           <form onSubmit={formik.handleSubmit}>
-            {/* Autocomplete for Country */}
+            <TextField
+              margin="dense"
+              label="State Name*"
+              type="text"
+              fullWidth
+              variant="outlined"
+              {...formik.getFieldProps('statename')}
+              error={formik.touched.statename && Boolean(formik.errors.statename)}
+              helperText={formik.touched.statename && formik.errors.statename}
+            />
+
             <Autocomplete
               options={countries}
-              getOptionLabel={(option) => option.label}
+              getOptionLabel={(option) => option}
               fullWidth
               renderInput={(params) => (
                 <TextField
                   {...params}
-                  label="Country"
+                  label="Country Name*"
                   margin="dense"
-                  variant="outlined"
                   error={formik.touched.countryname && Boolean(formik.errors.countryname)}
                   helperText={formik.touched.countryname && formik.errors.countryname}
-                  {...formik.getFieldProps('countryname')}
                 />
               )}
-            />
-
-            {/* Text field for State */}
-            <TextField
-              margin="dense"
-              label="State"
-              type="text"
-              fullWidth
-              variant="outlined"
-              {...formik.getFieldProps('state')}
-              error={formik.touched.state && Boolean(formik.errors.state)}
-              helperText={formik.touched.state && formik.errors.state}
+              value={formik.values.countryname}
+              onChange={(event, value) => formik.setFieldValue('countryname', value)}
+              onBlur={formik.handleBlur}
             />
           </form>
         </DialogContent>
         <DialogActions>
-          <Button type="submit" color="success" onClick={() => formik.handleSubmit()} label="Add" />
+          <Button type="submit" color="success" variant='outlined' onClick={() => formik.handleSubmit()} label='Add'/>
         </DialogActions>
       </Dialog>
 
@@ -131,8 +126,9 @@ const AddCountryModal: React.FC<AddCountryModalProps> = ({ open, onClose, onAdd 
         open={snackbarOpen}
         autoHideDuration={6000}
         onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
       >
-        <Alert onClose={handleSnackbarClose} severity={snackbarSeverity}>
+        <Alert onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{marginTop:'24%'}}>
           {snackbarMessage}
         </Alert>
       </Snackbar>

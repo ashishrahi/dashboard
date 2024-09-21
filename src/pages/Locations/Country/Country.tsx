@@ -6,7 +6,7 @@ import { IconButton, Menu, MenuItem, Button, Chip, Snackbar, Alert, Tooltip } fr
 import { useState, useEffect, useMemo } from 'react';
 import AddCountryModal from './addCountry';
 import UpdateCountryModal from './updateCountry';
-import { useCountry, useStatusMutationCountry,useUpdateMutationCountry } from '../../../services/fetchApi/locationApi/mutationCountry';
+import { useCountry, useStatusMutationCountry } from '../../../services/Api/location/mutationCountry';
 import { CancelIcon, CheckCircleIcon } from '../../../components/icons/Icons';
 import { CSVLink } from 'react-csv';
 import Papa from 'papaparse';

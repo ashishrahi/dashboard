@@ -1,394 +1,244 @@
 import * as React from 'react';
-import { useLocation, Link as RouterLink,Link } from 'react-router-dom';
-import {Button} from '../../../components/Input/Input';
-import {AddIcon,CancelIcon,CheckCircleIcon,MoreVertIcon,VisibilityIcon,EditIcon} from '../../../components/icons/Icons';
-import Alert from '@mui/material/Alert';
-import {CircularProgress,Snackbar} from '../../../components/feedBack/feedBack';
-import {Chip} from '../../../components/dataDisplay/dataDisplay';
-import { Avatar, Breadcrumbs, Link as MuiLink, Container, Menu, MenuItem, IconButton, Tooltip } from '@mui/material';
-import AddCountryModal from './addState'
-import UpdateCountryModal from './updateState';
+import { DataGrid } from '@mui/x-data-grid';
+import Paper from '@mui/material/Paper';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+import { IconButton, Menu, MenuItem, Button, Chip, Snackbar, Alert, Tooltip } from '@mui/material';
+import { useState, useEffect, useMemo } from 'react';
+import AddStateModal from './addState';
+import UpdateStateModal from './updateState';
+import { useStates,useStatusMutationState } from '../../../services/Api/location/mutationState';
+import { CancelIcon, CheckCircleIcon } from '../../../components/icons/Icons';
+import { CSVLink } from 'react-csv';
+import Papa from 'papaparse';
 
-import {
-  GridRowModes,
-  DataGrid,
-  GridToolbarContainer,
-  GridActionsCellItem,
-  GridRowEditStopReasons,
-  GridRowModesModel
-} from '@mui/x-data-grid';
-import {
-  randomCreatedDate,
-  randomTraderName,
-  randomId,
-  randomArrayItem,
-} from '@mui/x-data-grid-generator';
-import { useCountry, useStatusMutationCountry } from '../../../services/fetchApi/locationApi/mutationCountry';
+const DataTable = () => {
+  const [rows, setRows] = useState([]);
+  const [addModalOpen, setAddModalOpen] = useState(false);
+  const [updateModalOpen, setUpdateModalOpen] = useState(false);
+  const [selectedState, setSelectedState] = useState(null);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const { data, refetch } = useStates();
+  const { mutateAsync: statusMutation } = useStatusMutationState();
+  const [anchorEl, setAnchorEl] = useState(null);
 
-const roles = ['Market', 'Finance', 'Development'];
-const randomRole = () => randomArrayItem(roles);
-
-interface Row {
-  id: string;
-  name: string;
-  age: number;
-  joinDate: Date;
-  role: string;
-  isNew?: boolean;
-  _id?: string;
-  status?: boolean;
-  image?: string;
-  categoryname?: string;
-
-}
-
-
-
-interface EditToolbarProps {
-  setRows: React.Dispatch<React.SetStateAction<Row[]>>;
-  setRowModesModel: React.Dispatch<React.SetStateAction<GridRowModesModel>>;
-}
-
-function EditToolbar(props: EditToolbarProps) {
-  const { setRows, setRowModesModel } = props;
-  const [open, setOpen] = React.useState(false);
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
-
-  const handleClick = () => {
-    const id = randomId();
-    setRows((oldRows) => [...oldRows, { id, name: '', age: '', isNew: true }]);
-    setRowModesModel((oldModel) => ({
-      ...oldModel,
-      [id]: { mode: GridRowModes.Edit, fieldToFocus: 'name' },
-    }));
-  };
-
-  return (
-    <GridToolbarContainer>
-        <Button color="primary" startIcon={<AddIcon />} onClick={handleOpen} label='Add State'>
-        </Button>
-        <AddCountryModal open={open} onClose={handleClose}/>
-    </GridToolbarContainer>
-  );
-}
-
-export default function FullFeaturedCrudGrid() {
-  const {  data = [], isLoading } = useCountriesQuery({ refetchInterval: 5000 });
-  const location = useLocation();
-  const [rows, setRows] = React.useState<Row[]>(data || []);
-  const [rowModesModel, setRowModesModel] = React.useState<GridRowModesModel>({});
-  const [snackbar, setSnackbar] = React.useState<{ open: boolean; message: string; severity: 'success' | 'error' }>({ open: false, message: '', severity: 'success' });
-  const [loading, setLoading] = React.useState<boolean>(false);
-  const [initialLoading, setInitialLoading] = React.useState<boolean>(true);
-  const [pageSize, setPageSize] = React.useState<number>(5);
-  const [page, setPage] = React.useState<number>(0);
-  const [menuAnchorEl, setMenuAnchorEl] = React.useState<null | HTMLElement>(null);
-  const [currentRowId, setCurrentRowId] = React.useState<string | null>(null);
-  const { mutateAsync: statusMutation } = useUpdateCountryStatus();
-  const [open, setOpen] = React.useState(false);
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
-  
-  React.useEffect(() => {
+  useEffect(() => {
     if (data) {
-      setRows(data);
+      const updatedRows = data.map((item, index) => ({
+        ...item,
+        countryname: item.countryname.charAt(0).toUpperCase() + item.countryname.slice(1).toLowerCase(),
+        statename: item.statename.charAt(0).toUpperCase() + item.statename.slice(1).toLowerCase(),
+        serialNumber: index + 1,
+      }));
+      setRows(updatedRows);
     }
-
-    setTimeout(() => {
-      setInitialLoading(false);
-    }, 500);
   }, [data]);
 
-  const handleRowEditStop = (params: { reason: GridRowEditStopReasons }, event: React.SyntheticEvent) => {
-    if (params.reason === GridRowEditStopReasons.rowFocusOut) {
-      event.defaultMuiPrevented = true;
-    }
+  const handleEdit = (id) => {
+    const stateToEdit = rows.find(row => row._id === id);
+    setSelectedState(stateToEdit);
+    setUpdateModalOpen(true);
   };
 
-  const handleEditClick = (id: string) => () => {
-    setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.Edit } });
-  };
-
-  const handleSaveClick = (id: string) => async () => {
-    setLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    setLoading(false);
-    setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.View } });
-    setSnackbar({ open: true, message: 'Row saved successfully', severity: 'success' });
-  };
-
-  const handleDeleteClick = (id: string) => async () => {
-    setLoading(true);
-    setRows(rows.filter((row) => row.id !== id));
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    setLoading(false);
-
-    setSnackbar({ open: true, message: 'Row deleted successfully', severity: 'error' });
-  };
-
-  const handleCancelClick = (id: string) => () => {
-    setRowModesModel({
-      ...rowModesModel,
-      [id]: { mode: GridRowModes.View, ignoreModifications: true },
-    });
-
-    const editedRow = rows.find((row) => row.id === id);
-    if (editedRow?.isNew) {
-      setRows(rows.filter((row) => row.id !== id));
-    }
-  };
-
-  const processRowUpdate = (newRow: Row) => {
-    const updatedRow = { ...newRow, isNew: false };
-    setRows(rows.map((row) => (row.id === newRow.id ? updatedRow : row)));
-    return updatedRow;
-  };
-
-  const handleRowModesModelChange = (newRowModesModel: GridRowModesModel) => {
-    setRowModesModel(newRowModesModel);
-  };
-
-  const handleCloseSnackbar = () => {
-    setSnackbar({ ...snackbar, open: false });
-  };
-
-  const handleStatusToggle = async (id: string) => {
+  const handleStatusToggle = async (id) => {
     try {
       const row = rows.find((row) => row._id === id);
-      if (row) {
-        const updatedStatus = !row.status;
-        await statusMutation(id);
-        setRows((prevRows) =>
-          prevRows.map((row) =>
-            row._id === id ? { ...row, status: updatedStatus } : row
-          )
-        );
-      }
+      const updatedStatus = !row.status;
+      await statusMutation(id); // Ensure the mutation is awaited
+      setRows((prevRows) =>
+        prevRows.map((row) =>
+          row._id === id ? { ...row, status: updatedStatus } : row
+        )
+      );
+      setSnackbarMessage(`State status updated to ${updatedStatus ? 'Active' : 'Inactive'}`);
+      setSnackbarOpen(true); // Show snackbar on success
     } catch (error) {
       console.error('Error updating status', error);
+      setSnackbarMessage('Error updating State status');
+      setSnackbarOpen(true); // Show snackbar on error
     }
   };
 
-  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>, id: string) => {
-    setMenuAnchorEl(event.currentTarget);
-    setCurrentRowId(id);
+  const handleAddState = (newState) => {
+    setRows((prevRows) => [...prevRows, newState]);
+    refetch();
+  };
+
+  const handleUpdateState = (updatedState) => {
+    setRows((prevRows) =>
+      prevRows.map(row => (row._id === updatedState._id ? updatedState : row))
+    );
+    setUpdateModalOpen(false);
+    refetch();
+  };
+
+  const handleSnackbarClose = () => {
+    setSnackbarOpen(false);
+  };
+
+  const handleImportCSV = (event) => {
+    const file = event.target.files[0];
+    Papa.parse(file, {
+      header: true,
+      skipEmptyLines: true,
+      complete: (results) => {
+        const importedRows = results.data.map((item, index) => ({
+          ...item,
+          serialNumber: index + 1,
+        }));
+        setRows(importedRows);
+        setSnackbarMessage('States imported successfully!');
+        setSnackbarOpen(true);
+      },
+    });
+  };
+
+  const handleMenuClick = (event) => {
+    setAnchorEl(event.currentTarget);
   };
 
   const handleMenuClose = () => {
-    setMenuAnchorEl(null);
-    setCurrentRowId(null);
+    setAnchorEl(null);
   };
 
-  const handleViewClick = () => {
-    handleMenuClose();
-    if (currentRowId) {
-      // Navigate to view page or perform the view action
-    }
-  };
-
-  const handleEditClickMenu = () => {
-    handleMenuClose();
-    if (currentRowId) {
-      // Handle edit action
-      setRowModesModel({ ...rowModesModel, [currentRowId]: { mode: GridRowModes.Edit } });
-    }
-  };
-
-  const handleDeleteClickMenu = () => {
-    handleMenuClose();
-    if (currentRowId) {
-      handleDeleteClick(currentRowId)();
-    }
-  };
-
-  const capitalizeFirstLetter = (string: string) => {
-    return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
-  };
-
-  const columns = [
-    // {
-    //   field: 'image',
-    //   headerName: 'Image',
-    //   width: 280,
-    //   renderCell: (params: { value: string; row: Row }) => (
-    //     <Avatar src={params.value} alt={params.row.name} />
-    //   ),
-    // },
-    {
-      field: 'countryname',
-      headerName: 'Country Name',
-      width: 280,
-      renderCell: (params: { row: Row }) => (
-        <div>{capitalizeFirstLetter(params.row.countryname || '')}</div>
-      ),
-    },
+  const columns = useMemo(() => [
+    { field: 'serialNumber', headerName: 'S/no.', width: 180 },
+    
+    { field: 'createAt', headerName: 'CreatedAt.', width: 180 },
+    { field: 'countryname', headerName: 'Country', width: 180 },
+    { field: 'statename', headerName: 'State', width: 180 },
     {
       field: 'status',
       headerName: 'Status',
-      width: 280,
-      renderCell: (params: { row: Row }) => {
-        return (
-          <div className={`cellWithStatus ${params.row.status ? 'active' : 'inactive'}`}>
-            {params.row.status ? (
-              <Chip
-                value={params.row.status}
-                icon={<CheckCircleIcon style={{ color: 'green' }} />}
-                label="Active"
-                variant="outlined"
-                onClick={() => handleStatusToggle(params.row._id!)}
-              />
-            ) : (
-              <Chip
-                value={params.row.status}
-                icon={<CancelIcon style={{ color: 'red' }} />}
-                label="Inactive"
-                variant="outlined"
-                onClick={() => handleStatusToggle(params.row._id!)}
-              />
-            )}
-          </div>
-        );
-      },
+      width: 180,
+      renderCell: (params) => (
+        <div className={`cellWithStatus ${params.row.status}`}>
+          <Chip
+            value={params.value}
+            icon={params.row.status ? <CheckCircleIcon style={{ color: 'green' }} /> : <CancelIcon style={{ color: 'red' }} />}
+            label={params.row.status ? "Active" : "Inactive"}
+            variant="outlined"
+            style={{ cursor: 'pointer' }} // Change cursor for better UX
+          />
+        </div>
+      ),
     },
     {
       field: 'actions',
-      type: 'actions',
       headerName: 'Actions',
-      width: 100,
-      cellClassName: 'actions',
-      renderCell: (params: { id: string }) => (
-        <>
-          <IconButton onClick={(event) => handleMenuOpen(event, params.id)}>
-            <MoreVertIcon />
-          </IconButton>
-          <Menu
-            anchorEl={menuAnchorEl}
-            open={Boolean(menuAnchorEl) && currentRowId === params.id}
-            onClose={handleMenuClose}
-          >
-            <MenuItem onClick={handleViewClick}><Tooltip title='View'><VisibilityIcon/></Tooltip></MenuItem>
-            <MenuItem onClick={handleOpen}><Tooltip title='Edit'><EditIcon/></Tooltip></MenuItem>
-          <UpdateCountryModal open={open} onClose={handleClose} id = {currentRowId} />
-          </Menu>
-        </>
+      width: 130,
+      renderCell: (params) => (
+        <ActionsMenu
+          id={params.id}
+          currentStatus={params.row.status}
+          onEdit={handleEdit} // Pass edit function
+          onToggleStatus={handleStatusToggle} // Pass toggle function
+        />
       ),
     },
-  ];
+  ], [handleEdit, handleStatusToggle]); // Add dependencies
 
-  const getRowHeight = () => {
-    return 70; // Adjust the height based on your needs
+  return (
+    <>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+        <Button onClick={() => setAddModalOpen(true)} variant="outlined" color="primary">
+          Add State
+        </Button>
+        <Tooltip title='Import & Export Data'>
+
+        <IconButton
+          onClick={handleMenuClick}
+          style={{ width: '48px', height: '48px' }} // Set fixed size
+        >
+          <MoreVertIcon />
+        </IconButton>
+          <Menu
+            anchorEl={anchorEl}
+            open={Boolean(anchorEl)}
+            onClose={handleMenuClose}
+            anchorOrigin={{
+              vertical: 'bottom',
+              horizontal: 'right',
+            }}
+            transformOrigin={{
+              vertical: 'top',
+              horizontal: 'right',
+            }}
+          >
+            <MenuItem>
+              <input type="file" accept=".csv" onChange={handleImportCSV} style={{ display: 'none' }} id="csv-upload" />
+              <label htmlFor="csv-upload" style={{ cursor: 'pointer' }}>Import from CSV</label>
+            </MenuItem>
+            <MenuItem onClick={handleMenuClose}>
+              <CSVLink data={rows} filename={"states.csv"}>
+                Export to CSV
+              </CSVLink>
+            </MenuItem>
+          </Menu>
+        </Tooltip>
+      </div>
+
+      <Paper sx={{ height: 500, width: '100%' }}>
+        <DataGrid
+          rows={rows}
+          columns={columns}
+          getRowId={(row) => row._id}
+          paginationModel={{ page: 0, pageSize: 25 }}
+          style={{ maxHeight: '100%', width: '100%' }}
+          pageSizeOptions={[25, 100]}
+          sx={{
+            '& .MuiDataGrid-columnHeaderTitle': {
+              fontWeight: 'bold',
+            },
+          }}
+        />
+      </Paper>
+
+      <AddStateModal open={addModalOpen} onClose={() => setAddModalOpen(false)} onAdd={handleAddState} />
+      <UpdateStateModal open={updateModalOpen} onClose={() => setUpdateModalOpen(false)} state={selectedState} id={selectedState?._id} onUpdate={handleUpdateState} />
+
+      {/* Snackbar for status update */}
+      <Snackbar 
+        open={snackbarOpen} 
+        autoHideDuration={4000} 
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }} // Set position to bottom-right
+        onClose={handleSnackbarClose}>
+        <Alert onClose={handleSnackbarClose} severity="success" sx={{ width: '100%', marginTop: '24%' }}>
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
+    </>
+  );
+};
+
+const ActionsMenu = ({ id, currentStatus, onEdit, onToggleStatus }) => {
+  const [anchorEl, setAnchorEl] = useState(null);
+
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
   };
 
-  const renderBreadcrumbs = () => {
-    const pathnames = location.pathname.split('/').filter((x) => x);
-    return (
-      <Breadcrumbs
-        aria-label="breadcrumb"
-        sx={{
-          marginBottom: '20px',
-        }}
-      >
-        <MuiLink color="inherit" component={RouterLink} to="/" sx={{textDecoration:'none'}}>
-          Home
-        </MuiLink>
-        {pathnames.map((value, index) => {
-          const last = index === pathnames.length - 1;
-          const to = `/${pathnames.slice(0, index + 1).join('/')}`;
-          return last ? (
-            <MuiLink color="textPrimary" sx={{textDecoration:'none'}}>
-              {capitalizeFirstLetter(value)}
-            </MuiLink>
-          ) : (
-            <MuiLink color="inherit" component={RouterLink} to={to} key={to} sx={{textDecoration:'none'}}>
-              {capitalizeFirstLetter(value)}
-            </MuiLink>
-          );
-        })}
-      </Breadcrumbs>
-    );
+  const handleClose = () => {
+    setAnchorEl(null);
   };
 
   return (
-    <Container
-      sx={{
-        height: 500,
-        marginLeft: '20px',
-        marginRight: '40px',
-        marginTop: '20px',
-        width: '97%',
-        position: 'relative',
-        '& .actions': {
-          color: 'text.secondary',
-        },
-        '& .textPrimary': {
-          color: 'text.primary',
-        },
-      }}
-    >
-      {renderBreadcrumbs()}
-      {isLoading ? (
-        <CircularProgress />
-      ) : (
-        <>
-          {loading && (
-            <Container
-              sx={{
-                position: 'absolute',
-                marginRight: '10px',
-                top: '50%',
-                left: '50%',
-                transform: 'translate(-50%, -50%)',
-                zIndex: 1,
-              }}
-            >
-              <CircularProgress />
-            </Container>
-          )}
-          <DataGrid
-            rows={rows}
-            columns={columns}
-            getRowHeight={getRowHeight}
-            editMode="row"
-            getRowId={(row) => row._id!}
-            sx={{
-              '& .MuiDataGrid-columnHeaders': {
-                backgroundColor: '#f0f0f0', // Light grey color for header
-                fontWeight: 'bold',
-              },
-              '& .MuiDataGrid-columnHeader': {
-                color: '#000', // Text color for header
-              },
-            }}
-            rowModesModel={rowModesModel}
-            onRowModesModelChange={handleRowModesModelChange}
-            onRowEditStop={handleRowEditStop}
-            processRowUpdate={processRowUpdate}
-            pagination
-            pageSize={pageSize}
-            onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
-            page={page}
-            onPageChange={(newPage) => setPage(newPage)}
-            rowsPerPageOptions={[5, 10, 20]}
-            slots={{
-              toolbar: EditToolbar,
-            }}
-            slotProps={{
-              toolbar: { setRows, setRowModesModel },
-            }}
-          />
-        </>
-      )}
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={6000}
-        onClose={handleCloseSnackbar}
-        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+    <>
+      <IconButton onClick={handleClick}>
+        <MoreVertIcon />
+      </IconButton>
+      <Menu
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={handleClose}
       >
-        <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: '100%' }}>
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
-    </Container>
+        <MenuItem onClick={() => { onEdit(id); handleClose(); }}>Edit</MenuItem>
+        <MenuItem onClick={() => { onToggleStatus(id); handleClose(); }}>
+          {currentStatus ? 'Deactivate' : 'Activate'}
+        </MenuItem>
+      </Menu>
+    </>
   );
-}
+};
+
+export default DataTable;
