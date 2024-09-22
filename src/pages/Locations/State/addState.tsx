@@ -1,12 +1,14 @@
-import React from 'react';
-import { Button, TextField, IconButton, Autocomplete } from '../../../components/Input/Input';
-import { Dialog, DialogTitle, DialogContent, DialogActions, Snackbar, Alert } from '@mui/material';
+import React, { useEffect } from 'react';
+import { Button, TextField, IconButton, } from '../../../components/Input/Input';
+import { Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import { Close } from '@mui/icons-material';
+import {Snackbar,Alert} from '../../../components/feedBack/feedBack';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { SxProps, Theme } from '@mui/material/styles';
 import { useAddStateMutation } from '../../../services/Api/location/mutationState';
-
+import { useCountry } from '../../../services/Api/location/mutationCountry';
+import {Autocomplete} from '@mui/material';
 interface AddStateModalProps {
   open: boolean;
   onClose: () => void;
@@ -31,13 +33,24 @@ const dialogContentStyle: SxProps<Theme> = {
 };
 
 // Dummy list of countries for autocomplete
-const countries = ['United States', 'Canada', 'Mexico', 'United Kingdom', 'Germany', 'France', 'India'];
 
 const AddCountryModal: React.FC<AddStateModalProps> = ({ open, onClose, onAdd }) => {
   const { mutateAsync: addState } = useAddStateMutation();
+  const { data: countriesData } = useCountry(); 
+const[countrylist,setCountryList] = React.useState([])
+console.log(countrylist)
   const [snackbarOpen, setSnackbarOpen] = React.useState(false);
   const [snackbarMessage, setSnackbarMessage] = React.useState('');
   const [snackbarSeverity, setSnackbarSeverity] = React.useState<'success' | 'error'>('success');
+
+  useEffect(() => {
+    if(countriesData){
+      setCountryList(countriesData.map(c=>c.countryname))
+    }
+  }, [countriesData])
+  
+
+
 
   const formik = useFormik({
     initialValues: {
@@ -99,7 +112,7 @@ const AddCountryModal: React.FC<AddStateModalProps> = ({ open, onClose, onAdd })
             />
 
             <Autocomplete
-              options={countries}
+              options={countrylist}
               getOptionLabel={(option) => option}
               fullWidth
               renderInput={(params) => (
@@ -118,7 +131,7 @@ const AddCountryModal: React.FC<AddStateModalProps> = ({ open, onClose, onAdd })
           </form>
         </DialogContent>
         <DialogActions>
-          <Button type="submit" color="success" variant='outlined' onClick={() => formik.handleSubmit()} label='Add'/>
+          <Button type="submit" color="success" variant='contained' onClick={() => formik.handleSubmit()} label='Add'/>
         </DialogActions>
       </Dialog>
 

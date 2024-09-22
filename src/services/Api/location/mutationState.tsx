@@ -12,9 +12,24 @@ const fetchStates = async () => {
   catch (error) {
     console.log('Error fetching states:', error);
     
-  }
+  }};
 
-};
+////////////////////////////   CountryList //////////////////
+
+const fetchCountryList = async () => {
+  try {
+    const response = await api.get(`/countries/country/list`);
+    return response.data;
+  } 
+  catch (error) {
+    console.log('Error fetching countrylist:', error);
+    
+  }};
+
+
+
+
+
 //------------- State by Id
 
 const fetchStateById = async (id) => {
@@ -91,6 +106,16 @@ const fetchStateById = async (id) => {
  export const useStates = () => {
  return useQuery('states', fetchStates);
  };
+
+////////////////////////// fetching countrylist mutations /////////////////////////////////////
+
+ // 
+ export const useCountriesList = () => {
+  return useQuery('countries', fetchCountryList);
+  };
+
+
+
 
 
 //--------------- Mutation to get State by ID

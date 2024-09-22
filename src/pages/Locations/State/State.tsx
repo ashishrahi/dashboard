@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { DataGrid } from '@mui/x-data-grid';
+import AddIcon from '@mui/icons-material/Add';
 import Paper from '@mui/material/Paper';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { IconButton, Menu, MenuItem, Button, Chip, Snackbar, Alert, Tooltip } from '@mui/material';
@@ -141,8 +142,8 @@ const DataTable = () => {
   return (
     <>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-        <Button onClick={() => setAddModalOpen(true)} variant="outlined" color="primary">
-          Add State
+        <Button  onClick={() => setAddModalOpen(true)} variant="contained" color="primary">
+        <AddIcon sx={{marginRight:'4px'}}/>   Add State
         </Button>
         <Tooltip title='Import & Export Data'>
 

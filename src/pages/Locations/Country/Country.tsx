@@ -10,6 +10,7 @@ import { useCountry, useStatusMutationCountry } from '../../../services/Api/loca
 import { CancelIcon, CheckCircleIcon } from '../../../components/icons/Icons';
 import { CSVLink } from 'react-csv';
 import Papa from 'papaparse';
+import AddIcon from '@mui/icons-material/Add';
 
 const DataTable = () => {
   const [rows, setRows] = useState([]);
@@ -140,8 +141,8 @@ const DataTable = () => {
   return (
     <>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-        <Button onClick={() => setAddModalOpen(true)} variant="outlined" color="primary">
-          Add Country
+        <Button onClick={() => setAddModalOpen(true)} variant="contained" color="primary">
+        <AddIcon/>  Add Country
         </Button>
         <Tooltip title='Import & Export Data'>
 

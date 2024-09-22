@@ -92,7 +92,7 @@ const UpdateCountryModal: React.FC<UpdateCountryModalProps> = ({ open, onClose, 
         )}
       </DialogContent>
       <DialogActions>
-        <Button type="submit" color="success" variant='outlined' onClick={formik.handleSubmit} label="Update" />
+        <Button type="submit" color="success" variant='contained' onClick={formik.handleSubmit} label="Update" />
       </DialogActions>
     </Dialog>
   );

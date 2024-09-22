@@ -95,7 +95,7 @@ const AddCountryModal: React.FC<AddCountryModalProps> = ({ open, onClose, onAdd 
           </form>
         </DialogContent>
         <DialogActions>
-          <Button type="submit" color="success" variant='outlined' onClick={() => formik.handleSubmit()} label='Add'/>
+          <Button type="submit" color="success" variant='contained' onClick={() => formik.handleSubmit()} label='Add'/>
         </DialogActions>
       </Dialog>
 
