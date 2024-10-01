@@ -79,7 +79,8 @@ const SignIn: React.FC = () => {
 
             <div className="mb-5 relative">
               <TextField
-                label="password*"
+                label="Password*"
+                placeholder='password'
                 type={showPassword ? 'text' : 'password'}
                 id="password"
                 name="password"
@@ -111,8 +112,7 @@ const SignIn: React.FC = () => {
             </Button>
 
             <div className="text-center my-5">Or</div>
-email:admin@admin.com
-password:password
+
             {/* <GoogleLogin
               onSuccess={handleGoogleLoginSuccess}
               onError={handleGoogleLoginFailure}
