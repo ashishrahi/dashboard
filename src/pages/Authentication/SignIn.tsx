@@ -111,15 +111,16 @@ const SignIn: React.FC = () => {
             </Button>
 
             <div className="text-center my-5">Or</div>
-
-            <GoogleLogin
+email:admin@admin.com
+password:password
+            {/* <GoogleLogin
               onSuccess={handleGoogleLoginSuccess}
               onError={handleGoogleLoginFailure}
               shape="rectangular"
               theme="outline"
               text="signin_with"
               width="100%"
-            />
+            /> */}
           </form>
         </Box>
       </Container>
