@@ -7,7 +7,7 @@ import { IconButton, Menu, MenuItem, Button, Chip, Snackbar, Alert, Tooltip } fr
 import { useState, useEffect, useMemo } from 'react';
 import AddStateModal from './addState';
 import UpdateStateModal from './updateState';
-import { useStates,useStatusMutationState } from '../../../services/Api/location/mutationState';
+import { useStates,useStatusMutationState } from '../../../services/Api/locationApi/mutationState';
 import { CancelIcon, CheckCircleIcon } from '../../../components/icons/Icons';
 import { CSVLink } from 'react-csv';
 import Papa from 'papaparse';

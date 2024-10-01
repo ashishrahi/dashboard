@@ -1,14 +1,14 @@
 import React, { useEffect } from 'react';
-import { Button, IconButton } from '../../../components/Input/Input';
+import { Button, IconButton, TextField } from '../../../components/Input/Input';
 import { Dialog, DialogTitle, DialogContent, DialogActions, CircularProgress } from '@mui/material';
 import { Close } from '@mui/icons-material';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { SxProps, Theme } from '@mui/material/styles';
-import { useStateById, useUpdateMutationState } from '../../../services/Api/locationApi/mutationState';
+import { useCityById, useUpdateMutationCity } from '../../../services/Api/locationApi/mutationCity';
 import { useCountry } from '../../../services/Api/locationApi/mutationCountry';
+import { useStates } from '../../../services/Api/locationApi/mutationState';
 import Autocomplete from '@mui/material/Autocomplete';
-import TextField from '@mui/material/TextField';
 
 interface UpdateCountryModalProps {
   open: boolean;
@@ -17,8 +17,9 @@ interface UpdateCountryModalProps {
 }
 
 const validationSchema = Yup.object({
-  statename: Yup.string().required('State name is required*'),
   countryname: Yup.string().required('Country name is required*'),
+  statename: Yup.string().required('State name is required*'),
+  cityname: Yup.string().required('City name is required*'),
 });
 
 const modalStyle: SxProps<Theme> = {
@@ -31,23 +32,25 @@ const modalStyle: SxProps<Theme> = {
 const dialogContentStyle: SxProps<Theme> = {
   backgroundColor: '#e0e0e0',
   padding: '16px',
-  maxHeight: '300px', // Set max height for scrolling
-  overflowY: 'auto',   // Enable vertical scrolling
+  maxHeight: '300px',
+  overflowY: 'auto',
 };
 
 const UpdateCountryModal: React.FC<UpdateCountryModalProps> = ({ open, onClose, id }) => {
-  const { data, isLoading, isSuccess } = useStateById(id);
-  const { mutateAsync: updateState } = useUpdateMutationState();
+  const { data, isLoading, isSuccess } = useCityById(id);
+  const { mutateAsync: updateCity } = useUpdateMutationCity();
   const { data: countryData, isLoading: isCountryLoading } = useCountry();
+  const { data: stateData, isLoading: isStateLoading } = useStates();
 
   const formik = useFormik({
     initialValues: {
       countryname: '',
       statename: '',
+      cityname: '',
     },
     validationSchema,
     onSubmit: async (values) => {
-      await updateState({ id, values });
+      await updateCity({ id, values });
       onClose();
     },
     enableReinitialize: true,
@@ -58,6 +61,7 @@ const UpdateCountryModal: React.FC<UpdateCountryModalProps> = ({ open, onClose, 
       formik.setValues({
         countryname: data.countryname || '',
         statename: data.statename || '',
+        cityname: data.cityname || '',
       });
     }
   }, [data, isSuccess]);
@@ -65,7 +69,7 @@ const UpdateCountryModal: React.FC<UpdateCountryModalProps> = ({ open, onClose, 
   return (
     <Dialog open={open} onClose={onClose} PaperProps={{ sx: modalStyle }}>
       <DialogTitle>
-        Update State
+        Update City
         <IconButton
           aria-label="close"
           onClick={onClose}
@@ -79,11 +83,12 @@ const UpdateCountryModal: React.FC<UpdateCountryModalProps> = ({ open, onClose, 
           <CircularProgress />
         ) : (
           <form onSubmit={formik.handleSubmit}>
+            {/* Country */}
             <Autocomplete
               sx={{ marginTop: '4%' }}
               options={countryData || []}
               getOptionLabel={(option) => option.countryname || ''}
-              value={countryData?.find(country => country.countryname === formik.values.countryname) || null} // Set the selected value
+              value={countryData?.find(country => country.countryname === formik.values.countryname) || null}
               onChange={(event, newValue) => {
                 formik.setFieldValue('countryname', newValue ? newValue.countryname : '');
                 formik.setFieldValue('statename', ''); // Reset state when country changes
@@ -91,7 +96,7 @@ const UpdateCountryModal: React.FC<UpdateCountryModalProps> = ({ open, onClose, 
               renderInput={(params) => (
                 <TextField
                   {...params}
-                  label="Country Name*"
+                  label="Country*"
                   error={formik.touched.countryname && Boolean(formik.errors.countryname)}
                   helperText={formik.touched.countryname && formik.errors.countryname}
                   InputProps={{
@@ -106,15 +111,43 @@ const UpdateCountryModal: React.FC<UpdateCountryModalProps> = ({ open, onClose, 
                 />
               )}
             />
+            {/* State */}
+            <Autocomplete
+              sx={{ marginTop: '4%' }}
+              options={stateData || []}
+              getOptionLabel={(option) => option.statename || ''}
+              value={stateData?.find(state => state.statename === formik.values.statename) || null}
+              onChange={(event, newValue) => {
+                formik.setFieldValue('statename', newValue ? newValue.statename : '');
+              }}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="State*"
+                  error={formik.touched.statename && Boolean(formik.errors.statename)}
+                  helperText={formik.touched.statename && formik.errors.statename}
+                  InputProps={{
+                    ...params.InputProps,
+                    endAdornment: (
+                      <>
+                        {isStateLoading ? <CircularProgress size={20} /> : null}
+                        {params.InputProps.endAdornment}
+                      </>
+                    ),
+                  }}
+                />
+              )}
+            />
+            {/* City Name */}
             <TextField
               margin="dense"
-              label="State Name*"
+              label="City*"
               type="text"
               fullWidth
               variant="outlined"
-              {...formik.getFieldProps('statename')}
-              error={formik.touched.statename && Boolean(formik.errors.statename)}
-              helperText={formik.touched.statename && formik.errors.statename}
+              {...formik.getFieldProps('cityname')}
+              error={formik.touched.cityname && Boolean(formik.errors.cityname)}
+              helperText={formik.touched.cityname && formik.errors.cityname}
             />
           </form>
         )}

@@ -2,25 +2,28 @@ import * as React from 'react';
 import { DataGrid } from '@mui/x-data-grid';
 import Paper from '@mui/material/Paper';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import { IconButton, Menu, MenuItem, Button, Chip, Snackbar, Alert, Tooltip } from '@mui/material';
+import { IconButton, Menu, MenuItem, Button, Chip, Snackbar, Alert, Tooltip, Avatar } from '@mui/material';
 import { useState, useEffect, useMemo, useCallback } from 'react';
-// import AddCountryModal from './addCountry';
-// import UpdateCountryModal from './updateCountry';
-import {useUser} from '../../services/Api/usersApi/mutationUser';
-import { CancelIcon, CheckCircleIcon } from '../../components/icons/Icons';
+import AddCategoryModal from './addCategory'; // Adjust import if necessary
+import UpdateCategoryModal from './updateCategory'; // Adjust import if necessary
+import { useCategory, useStatusMutationCategory } from '../../../services/Api/categoryApi/mutationCategory'; // Adjust import if necessary
+import { CancelIcon, CheckCircleIcon } from '../../../components/icons/Icons';
 import { CSVLink } from 'react-csv';
 import Papa from 'papaparse';
 import AddIcon from '@mui/icons-material/Add';
-import { debounce } from 'lodash'; // Import debounce from lodash
+import { debounce } from 'lodash';
+import AutorenewIcon from '@mui/icons-material/Autorenew';
+import EditIcon from '@mui/icons-material/Edit';
 
 const DataTable = () => {
   const [rows, setRows] = useState([]);
   const [addModalOpen, setAddModalOpen] = useState(false);
   const [updateModalOpen, setUpdateModalOpen] = useState(false);
-  const [selectedCountry, setSelectedCountry] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState(null);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
-  const { data, refetch } = useUser();
+  const { data, refetch } = useCategory();
+  const { mutateAsync: statusMutation } = useStatusMutationCategory();
   const [anchorEl, setAnchorEl] = useState(null);
 
   useEffect(() => {
@@ -28,56 +31,56 @@ const DataTable = () => {
       const updatedRows = data.map((item, index) => ({
         _id: item._id,
         serialNumber: index + 1,
+        categoryname: item.categoryname,
+        categorydescription: item.categorydescription,
         createdAt: item.createdAt,
-        username: item.username,
-        email: item.email,
-        phone: item.phone,
         status: item.status,
+        image: item.image, // Adding image field
       }));
       setRows(updatedRows);
     }
   }, [data]);
 
   const handleEdit = (id) => {
-    const countryToEdit = rows.find(row => row._id === id);
-    setSelectedCountry(countryToEdit);
+    const categoryToEdit = rows.find(row => row._id === id);
+    setSelectedCategory(categoryToEdit);
     setUpdateModalOpen(true);
   };
 
-  // const debouncedStatusToggle = useCallback(
-  //   debounce(async (id) => {
-  //     try {
-  //       const row = rows.find((row) => row._id === id);
-  //       const updatedStatus = !row.status;
-  //       await statusMutation(id);
-  //       setRows((prevRows) =>
-  //         prevRows.map((row) =>
-  //           row._id === id ? { ...row, status: updatedStatus } : row
-  //         )
-  //       );
-  //       setSnackbarMessage(`Country status updated to ${updatedStatus ? 'Active' : 'Inactive'}`);
-  //       setSnackbarOpen(true);
-  //     } catch (error) {
-  //       console.error('Error updating status', error);
-  //       setSnackbarMessage('Error updating country status');
-  //       setSnackbarOpen(true);
-  //     }
-  //   }, 300),
-  //   [rows, statusMutation]
-  // );
+  const debouncedStatusToggle = useCallback(
+    debounce(async (id) => {
+      try {
+        const row = rows.find((row) => row._id === id);
+        const updatedStatus = !row.status;
+        await statusMutation(id);
+        setRows((prevRows) =>
+          prevRows.map((row) =>
+            row._id === id ? { ...row, status: updatedStatus } : row
+          )
+        );
+        setSnackbarMessage(`Category status updated to ${updatedStatus ? 'Active' : 'Inactive'}`);
+        setSnackbarOpen(true);
+      } catch (error) {
+        console.error('Error updating status', error);
+        setSnackbarMessage('Error updating category status');
+        setSnackbarOpen(true);
+      }
+    }, 300),
+    [rows, statusMutation]
+  );
 
   const handleStatusToggle = (id) => {
     debouncedStatusToggle(id);
   };
 
-  const handleAddCountry = (newCountry) => {
-    setRows((prevRows) => [...prevRows, newCountry]);
+  const handleAddCategory = (newCategory) => {
+    setRows((prevRows) => [...prevRows, newCategory]);
     refetch();
   };
 
-  const handleUpdateCountry = (updatedCountry) => {
+  const handleUpdateCategory = (updatedCategory) => {
     setRows((prevRows) =>
-      prevRows.map(row => (row._id === updatedCountry._id ? updatedCountry : row))
+      prevRows.map(row => (row._id === updatedCategory._id ? updatedCategory : row))
     );
     setUpdateModalOpen(false);
     refetch();
@@ -94,16 +97,16 @@ const DataTable = () => {
       skipEmptyLines: true,
       complete: (results) => {
         const importedRows = results.data.map((item, index) => ({
-          _id: item._id || `imported_${index}`, // Unique ID for imported items
+          _id: item._id || `imported_${index}`,
           serialNumber: index + 1,
+          categoryname: item.categoryname,
+          categorydescription: item.categorydescription,
           createdAt: item.createdAt,
-          name: item.username,
-          email: item.email,
-          mobile: item.mobile,
-          status: item.status === 'Active', // Assuming the status in CSV is 'Active' or 'Inactive'
+          status: item.status === 'Active',
+          image: item.image, // Include image from imported data
         }));
         setRows(importedRows);
-        setSnackbarMessage('Countries imported successfully!');
+        setSnackbarMessage('Categories imported successfully!');
         setSnackbarOpen(true);
       },
     });
@@ -118,15 +121,23 @@ const DataTable = () => {
   };
 
   const columns = useMemo(() => [
-    { field: 'serialNumber', headerName: 'S/no.', width: 180 },
+    { field: 'serialNumber', headerName: 'S/no.', width: 100 },
     { field: 'createdAt', headerName: 'Created At', width: 180 },
-    { field: 'username', headerName: 'Name', width: 180 },
-    { field: 'email', headerName: 'Email', width: 180 },
-    { field: 'phone', headerName: 'Mobile', width: 180 },
+    
+    {
+      field: 'image',
+      headerName: 'Category Image',
+      width: 180,
+      renderCell: (params) => (
+        <Avatar src={params.row.image} alt={params.row.categoryname} />
+      ),
+    },
+    { field: 'categoryname', headerName: 'Category Name', width: 200 },
+    { field: 'categorydescription', headerName: 'Description', width: 250 },
     {
       field: 'status',
       headerName: 'Status',
-      width: 180,
+      width: 120,
       renderCell: (params) => (
         <div className={`cellWithStatus ${params.row.status}`}>
           <Chip
@@ -157,8 +168,8 @@ const DataTable = () => {
   return (
     <>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-        <Button  onClick={() => setAddModalOpen(true)} variant="contained" color="success">
-          Users - List
+        <Button onClick={() => setAddModalOpen(true)} variant="contained" color="primary">
+          <AddIcon />Category
         </Button>
         <Tooltip title='Import & Export Data'>
           <IconButton onClick={handleMenuClick} style={{ width: '48px', height: '48px' }}>
@@ -182,7 +193,7 @@ const DataTable = () => {
               <label htmlFor="csv-upload" style={{ cursor: 'pointer' }}>Import from CSV</label>
             </MenuItem>
             <MenuItem onClick={handleMenuClose}>
-              <CSVLink data={rows} filename={"countries.csv"}>
+              <CSVLink data={rows} filename={"categories.csv"}>
                 Export to CSV
               </CSVLink>
             </MenuItem>
@@ -206,8 +217,8 @@ const DataTable = () => {
         />
       </Paper>
 
-      {/* <AddCountryModal open={addModalOpen} onClose={() => setAddModalOpen(false)} onAdd={handleAddCountry} /> */}
-      {/* <UpdateCountryModal open={updateModalOpen} onClose={() => setUpdateModalOpen(false)} country={selectedCountry} id={selectedCountry?._id} onUpdate={handleUpdateCountry} /> */}
+      <AddCategoryModal open={addModalOpen} onClose={() => setAddModalOpen(false)} onAdd={handleAddCategory} />
+      <UpdateCategoryModal open={updateModalOpen} onClose={() => setUpdateModalOpen(false)} category={selectedCategory} id={selectedCategory?._id} onUpdate={handleUpdateCategory} />
 
       <Snackbar 
         open={snackbarOpen} 
@@ -243,10 +254,19 @@ const ActionsMenu = ({ id, currentStatus, onEdit, onToggleStatus }) => {
         open={Boolean(anchorEl)}
         onClose={handleClose}
       >
-        <MenuItem onClick={() => { onEdit(id); handleClose(); }}>Edit</MenuItem>
+        <MenuItem onClick={() => { onEdit(id); handleClose(); }}>   <EditIcon  style={{ 
+      marginRight: 8,
+      color: 'blue' 
+    }}/>Edit</MenuItem>
         <MenuItem onClick={() => { onToggleStatus(id); handleClose(); }}>
-          {currentStatus ? 'Deactivate' : 'Activate'}
-        </MenuItem>
+       <AutorenewIcon
+    style={{ 
+      marginRight: 8,
+      color: currentStatus ? 'red' : 'green' 
+    }}
+  />
+  {currentStatus ? 'Deactivate' : 'Activate'}
+</MenuItem>
       </Menu>
     </>
   );

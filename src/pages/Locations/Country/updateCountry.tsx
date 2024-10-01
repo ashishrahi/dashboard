@@ -6,7 +6,7 @@ import { Close } from '@mui/icons-material';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { SxProps, Theme } from '@mui/material/styles';
-import { useCountryById,useUpdateMutationCountry } from '../../../services/Api/location/mutationCountry';  // Updated to query hook
+import { useCountryById,useUpdateMutationCountry } from '../../../services/Api/locationApi/mutationCountry';  // Updated to query hook
 
 interface UpdateCountryModalProps {
   open: boolean;

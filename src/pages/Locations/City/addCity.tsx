@@ -1,14 +1,15 @@
 import React, { useEffect } from 'react';
-import { Button, TextField, IconButton, } from '../../../components/Input/Input';
+import { Button, TextField, IconButton } from '../../../components/Input/Input';
 import { Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import { Close } from '@mui/icons-material';
-import {Snackbar,Alert} from '../../../components/feedBack/feedBack';
+import { Snackbar, Alert } from '../../../components/feedBack/feedBack';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { SxProps, Theme } from '@mui/material/styles';
-import { useAddStateMutation } from '../../../services/Api/locationApi/mutationState';
-import { useCountry } from '../../../services/Api/locationApi/mutationCountry';
-import {Autocomplete} from '@mui/material';
+import { useAddCityMutation } from '../../../services/Api/locationApi/mutationCity';
+import { useStates } from '../../../services/Api/locationApi/mutationState';
+import { Autocomplete } from '@mui/material';
+
 interface AddStateModalProps {
   open: boolean;
   onClose: () => void;
@@ -22,7 +23,7 @@ const validationSchema = Yup.object({
 
 const modalStyle: SxProps<Theme> = {
   width: '500px',
-  height: '300px',
+  height: '400px',
   backgroundColor: '#f0f0f0',
   padding: '16px',
 };
@@ -32,44 +33,43 @@ const dialogContentStyle: SxProps<Theme> = {
   padding: '16px',
 };
 
-// Dummy list of countries for autocomplete
+const AddCountryModal: React.FC<AddStateModalProps> = ({ open, onClose }) => {
+  const { mutateAsync: addCity } = useAddCityMutation();
+  const { data: statesData } = useStates();
 
-const AddCountryModal: React.FC<AddStateModalProps> = ({ open, onClose, onAdd }) => {
-  const { mutateAsync: addState } = useAddStateMutation();
-  const { data: countriesData } = useCountry(); 
-const[countrylist,setCountryList] = React.useState([])
-console.log(countrylist)
+  const [countryList, setCountryList] = React.useState<string[]>([]);
+  const [stateList, setStateList] = React.useState<string[]>([]);
+
   const [snackbarOpen, setSnackbarOpen] = React.useState(false);
   const [snackbarMessage, setSnackbarMessage] = React.useState('');
   const [snackbarSeverity, setSnackbarSeverity] = React.useState<'success' | 'error'>('success');
 
   useEffect(() => {
-    if(countriesData){
-      setCountryList(countriesData.map(c=>c.countryname))
+    if (statesData) {
+      const countries = Array.from(new Set(statesData.map((state: any) => state.countryname))); // Unique countries
+      const states = statesData.map((state: any) => state.statename);
+      setCountryList(countries);
+      setStateList(states);
     }
-  }, [countriesData])
-  
-
-
+  }, [statesData]);
 
   const formik = useFormik({
     initialValues: {
       statename: '',
-      countryname: '', // Adding countryname to form state
+      countryname: '',
+      cityname: '',
     },
     validationSchema,
     onSubmit: async (values) => {
-      console.log('Submitting form with values:', values); // Debug log
       try {
-        await addState(values);
-        formik.resetForm(); // Reset the form fields after successful submission
-        setSnackbarMessage('State added successfully!');
+        await addCity(values);
+        formik.resetForm();
+        setSnackbarMessage('City added successfully!');
         setSnackbarSeverity('success');
         setSnackbarOpen(true);
         onClose();
       } catch (error) {
-        console.error('Failed to add State:', error); // Debug log
-        setSnackbarMessage('Failed to add State. Please try again.');
+        setSnackbarMessage('Failed to add city. Please try again.');
         setSnackbarSeverity('error');
         setSnackbarOpen(true);
       }
@@ -77,39 +77,27 @@ console.log(countrylist)
   });
 
   const handleSnackbarClose = () => {
-    console.log('Snackbar closing'); // Debug log
     setSnackbarOpen(false);
   };
 
   return (
     <>
-      <Dialog
-        open={open}
-        onClose={onClose}
-        PaperProps={{ sx: modalStyle }}
-      >
+      <Dialog open={open} onClose={onClose} PaperProps={{ sx: modalStyle }}>
         <DialogTitle>
-          Add New State
-          <IconButton 
-            aria-label="close" 
-            onClick={onClose} 
-            sx={{ position: 'absolute', right: 8, top: 8 }}
-          >
+          Add New City
+          <IconButton aria-label="close" onClick={onClose} sx={{ position: 'absolute', right: 8, top: 8 }}>
             <Close />
           </IconButton>
         </DialogTitle>
         <DialogContent sx={dialogContentStyle}>
           <form onSubmit={formik.handleSubmit}>
-          
-
             <Autocomplete
-              options={countrylist}
-              getOptionLabel={(option) => option}
+              options={countryList}
               fullWidth
               renderInput={(params) => (
                 <TextField
                   {...params}
-                  label="Country*"
+                  label="Country Name*"
                   margin="dense"
                   error={formik.touched.countryname && Boolean(formik.errors.countryname)}
                   helperText={formik.touched.countryname && formik.errors.countryname}
@@ -118,23 +106,39 @@ console.log(countrylist)
               value={formik.values.countryname}
               onChange={(event, value) => formik.setFieldValue('countryname', value)}
               onBlur={formik.handleBlur}
+              isOptionEqualToValue={(option, value) => option === value}
             />
-            {/* State */}
+            <Autocomplete
+              options={stateList}
+              fullWidth
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="State Name*"
+                  margin="dense"
+                  error={formik.touched.statename && Boolean(formik.errors.statename)}
+                  helperText={formik.touched.statename && formik.errors.statename}
+                />
+              )}
+              value={formik.values.statename}
+              onChange={(event, value) => formik.setFieldValue('statename', value)}
+              onBlur={formik.handleBlur}
+              isOptionEqualToValue={(option, value) => option === value}
+            />
             <TextField
               margin="dense"
-              label="State*"
+              label="City Name*"
               type="text"
               fullWidth
               variant="outlined"
-              {...formik.getFieldProps('statename')}
-              error={formik.touched.statename && Boolean(formik.errors.statename)}
-              helperText={formik.touched.statename && formik.errors.statename}
+              {...formik.getFieldProps('cityname')}
+              error={formik.touched.cityname && Boolean(formik.errors.cityname)}
+              helperText={formik.touched.cityname && formik.errors.cityname}
             />
-
           </form>
         </DialogContent>
         <DialogActions>
-          <Button type="submit" color="success" variant='contained' onClick={() => formik.handleSubmit()} label='Add'/>
+          <Button label='Add' type="submit" color="success" variant='contained' onClick={formik.handleSubmit}/>
         </DialogActions>
       </Dialog>
 
@@ -144,7 +148,7 @@ console.log(countrylist)
         onClose={handleSnackbarClose}
         anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
       >
-        <Alert onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{marginTop:'24%'}}>
+        <Alert onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ marginTop: '24%' }}>
           {snackbarMessage}
         </Alert>
       </Snackbar>

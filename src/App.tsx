@@ -27,9 +27,9 @@ import Users from '../src/pages/Users/Users';
 import ActiveUser from './pages/Users/ActiveUser';
 import InActiveUser from './pages/Users/InActiveUser';
 
-import Category from '../src/pages/Category/Category';
-import ActiveCategory from './pages/Category/ActiveCategory'
-import InactiveCategory from './pages/Category/InactiveCategory'
+import Category from '../src/pages/Category/Category/Category';
+import ActiveCategory from './pages/Category/statusCategory/activeCategory'
+import InactiveCategory from './pages/Category/statusCategory/inactiveCategory'
 
 import PaymentRequest from './pages/Payment Request/PaymentRequest';
 import Pending from './pages/Payment Request/Pending'

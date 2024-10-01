@@ -5,7 +5,7 @@ import { Close } from '@mui/icons-material';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { SxProps, Theme } from '@mui/material/styles';
-import { useAddCountryMutation } from '../../../services/Api/location/mutationCountry';
+import { useAddCountryMutation } from '../../../services/Api/locationApi/mutationCountry';
 
 interface AddCountryModalProps {
   open: boolean;
