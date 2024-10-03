@@ -1,13 +1,14 @@
 import React from 'react';
-import { Button, TextField, IconButton } from '../../../components/Input/Input';
+import { Button, TextField, IconButton } from '../../components/Input/Input';
 import { Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import { Close } from '@mui/icons-material';
-import { Snackbar, Alert } from '../../../components/feedBack/feedBack';
+import { Snackbar, Alert } from '../../components/feedBack/feedBack';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { SxProps, Theme } from '@mui/material/styles';
-import { useAddCategoryMutation } from '../../../services/Api/categoryApi/mutationCategory';
-
+import { useAddSubCategoryMutation } from '../../services/Api/subcategoryApi/mutationSubcategory';
+import Autocomplete from '@mui/material/Autocomplete';
+import { useCategory } from '../../services/Api/categoryApi/mutationCategory';
 interface AddStateModalProps {
   open: boolean;
   onClose: () => void;
@@ -15,10 +16,11 @@ interface AddStateModalProps {
 
 const validationSchema = Yup.object({
   categoryname: Yup.string().required('Category name is required*'),
-  categorydescription: Yup.string().required('Category description is required*'),
+  subcategoryname: Yup.string().required('Subcategory name is required*'),
+  subcategorydescription: Yup.string().required('Subcategory description is required*'),
   image: Yup.mixed()
     .required('Image is required*')
-    .test('fileSize', 'The file is too large', (value) => value && value.size <= 2 * 1024 * 1024) // Limit to 2MB
+    .test('fileSize', 'The file is too large', (value) => value && value.size <= 2 * 1024 * 1024)
     .test('fileType', 'Unsupported file format', (value) =>
       ['image/jpeg', 'image/png', 'image/gif'].includes(value?.type)
     ),
@@ -26,7 +28,7 @@ const validationSchema = Yup.object({
 
 const modalStyle: SxProps<Theme> = {
   width: '500px',
-  height: '300px',
+  height: 'auto',
   backgroundColor: '#f0f0f0',
   padding: '16px',
 };
@@ -37,7 +39,8 @@ const dialogContentStyle: SxProps<Theme> = {
 };
 
 const AddCategoryModal: React.FC<AddStateModalProps> = ({ open, onClose }) => {
-  const { mutateAsync: addCategory } = useAddCategoryMutation();
+  const { data: categoriesData, isLoading, isError } = useCategory();
+  const { mutateAsync: addSubCategory } = useAddSubCategoryMutation();
   const [snackbarOpen, setSnackbarOpen] = React.useState(false);
   const [snackbarMessage, setSnackbarMessage] = React.useState('');
   const [snackbarSeverity, setSnackbarSeverity] = React.useState<'success' | 'error'>('success');
@@ -46,30 +49,31 @@ const AddCategoryModal: React.FC<AddStateModalProps> = ({ open, onClose }) => {
   const formik = useFormik({
     initialValues: {
       categoryname: '',
-      categorydescription: '',
+      subcategoryname: '',
+      subcategorydescription: '',
       image: null,
     },
     validationSchema,
     onSubmit: async (values) => {
       const formData = new FormData();
       formData.append('categoryname', values.categoryname);
-      formData.append('categorydescription', values.categorydescription);
+      formData.append('subcategoryname', values.subcategoryname);
+      formData.append('subcategorydescription', values.subcategorydescription);
       if (values.image) {
         formData.append('image', values.image);
       }
 
       try {
-        console.log(formData)
-        await addCategory(formData);
+        await addSubCategory(formData);
         formik.resetForm();
-        setSelectedFileName(''); // Reset the file name after successful submission
-        setSnackbarMessage('Category added successfully!');
+        setSelectedFileName('');
+        setSnackbarMessage('Subcategory added successfully!');
         setSnackbarSeverity('success');
         setSnackbarOpen(true);
         onClose();
       } catch (error) {
-        console.error('Failed to add Category:', error);
-        setSnackbarMessage('Failed to add Category. Please try again.');
+        console.error('Failed to add Subcategory:', error);
+        setSnackbarMessage('Failed to add Subcategory. Please try again.');
         setSnackbarSeverity('error');
         setSnackbarOpen(true);
       }
@@ -90,33 +94,65 @@ const AddCategoryModal: React.FC<AddStateModalProps> = ({ open, onClose }) => {
     <>
       <Dialog open={open} onClose={onClose} PaperProps={{ sx: modalStyle }}>
         <DialogTitle>
-          Add New Category
+          Add New Subcategory
           <IconButton aria-label="close" onClick={onClose} sx={{ position: 'absolute', right: 8, top: 8 }}>
             <Close />
           </IconButton>
         </DialogTitle>
         <DialogContent sx={dialogContentStyle}>
           <form onSubmit={formik.handleSubmit}>
+            {/* Handle loading, error, or Autocomplete */}
+            {isLoading ? (
+              <p>Loading categories...</p>
+            ) : isError ? (
+              <p>Error loading categories</p>
+            ) : (
+              <Autocomplete
+                options={categoriesData.map((category: any) => ({
+                  label: category.categoryname, // Adjust to your data structure
+                  value: category._id,   // Adjust to your data structure
+                }))}
+                getOptionLabel={(option) => option.label}
+                onChange={(event, value) => formik.setFieldValue('categoryname', value?.value || '')}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    margin="dense"
+                    label="Select Category*"
+                    variant="outlined"
+                    fullWidth
+                    error={formik.touched.categoryname && Boolean(formik.errors.categoryname)}
+                    helperText={formik.touched.categoryname && formik.errors.categoryname}
+                  />
+                )}
+              />
+            )}
+
+            {/* Subcategory Name Input */}
             <TextField
               margin="dense"
-              label="Category Name*"
+              label="Subcategory Name*"
               type="text"
               fullWidth
               variant="outlined"
-              {...formik.getFieldProps('categoryname')}
-              error={formik.touched.categoryname && Boolean(formik.errors.categoryname)}
-              helperText={formik.touched.categoryname && formik.errors.categoryname}
+              {...formik.getFieldProps('subcategoryname')}
+              error={formik.touched.subcategoryname && Boolean(formik.errors.subcategoryname)}
+              helperText={formik.touched.subcategoryname && formik.errors.subcategoryname}
             />
+
+            {/* Subcategory Description Input */}
             <TextField
               margin="dense"
-              label="Category Description*"
+              label="Subcategory Description*"
               type="text"
               fullWidth
               variant="outlined"
-              {...formik.getFieldProps('categorydescription')}
-              error={formik.touched.categorydescription && Boolean(formik.errors.categorydescription)}
-              helperText={formik.touched.categorydescription && formik.errors.categorydescription}
+              {...formik.getFieldProps('subcategorydescription')}
+              error={formik.touched.subcategorydescription && Boolean(formik.errors.subcategorydescription)}
+              helperText={formik.touched.subcategorydescription && formik.errors.subcategorydescription}
             />
+
+            {/* File Input for Image */}
             <input
               type="file"
               onChange={handleFileChange}
@@ -130,12 +166,11 @@ const AddCategoryModal: React.FC<AddStateModalProps> = ({ open, onClose }) => {
           </form>
         </DialogContent>
         <DialogActions>
-          <Button type="submit" color="success" variant="contained" onClick={formik.handleSubmit}>
-            Add
-          </Button>
+          <Button label="Add" type="submit" color="success" variant="contained" onClick={formik.handleSubmit} />
         </DialogActions>
       </Dialog>
 
+      {/* Snackbar Notification */}
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={6000}

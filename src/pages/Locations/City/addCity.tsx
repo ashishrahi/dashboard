@@ -17,8 +17,10 @@ interface AddStateModalProps {
 }
 
 const validationSchema = Yup.object({
-  statename: Yup.string().required('State name is required*'),
-  countryname: Yup.string().required('Country name is required*'),
+  statename: Yup.string().required('State is required*'),
+  countryname: Yup.string().required('Country is required*'),
+  cityname: Yup.string().required('City is required*'),
+
 });
 
 const modalStyle: SxProps<Theme> = {

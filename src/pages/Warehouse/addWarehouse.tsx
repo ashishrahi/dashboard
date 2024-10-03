@@ -85,7 +85,8 @@ const WarehouseRegistration: React.FC<WarehouseRegistrationProps> = ({ open, onC
 
       try {
         await addWarehouse(formData);
-        onRegister(formData); // Pass the FormData object
+        formik.resetForm(); // Reset form fields
+        setSelectedImage(null); // Reset selected image
         onClose();
       } catch (error) {
         console.error('Failed to add warehouse:', error);
@@ -96,8 +97,6 @@ const WarehouseRegistration: React.FC<WarehouseRegistrationProps> = ({ open, onC
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
       setSelectedImage(event.target.files[0]);
-      // You might not need this since the image will be handled by FormData
-      // formik.setFieldValue('image', event.target.files[0]);
     }
   };
 
@@ -216,32 +215,31 @@ const WarehouseRegistration: React.FC<WarehouseRegistrationProps> = ({ open, onC
             error={formik.touched.country && Boolean(formik.errors.country)}
             helperText={formik.touched.country && formik.errors.country}
           />
-
-          <Box sx={{ mt: 2, mb: 2, textAlign: 'center' }}>
-            <input
-              accept="image/*"
-              style={{ display: 'none' }}
-              id="warehouse-image-upload"
-              type="file"
-              onChange={handleImageChange}
-            />
-            <label htmlFor="warehouse-image-upload">
-              <IconButton color="primary" aria-label="upload picture" component="span">
-                <Avatar
-                  alt="Warehouse Image"
-                  src={selectedImage ? URL.createObjectURL(selectedImage) : undefined}
-                  sx={{ width: 100, height: 100 }}
-                />
-                <PhotoCamera />
-              </IconButton>
-            </label>
-          </Box>
         </form>
+        
+        {/* Image Upload Section */}
+        <Box sx={{ mt: 2, mb: 2, textAlign: 'center' }}>
+          <input
+            accept="image/*"
+            style={{ display: 'none' }}
+            id="warehouse-image-upload"
+            type="file"
+            onChange={handleImageChange}
+          />
+          <label htmlFor="warehouse-image-upload">
+            <IconButton color="primary" aria-label="upload picture" component="span">
+              <Avatar
+                alt="Warehouse Image"
+                src={selectedImage ? URL.createObjectURL(selectedImage) : undefined}
+                sx={{ width: 100, height: 100 }}
+              />
+              <PhotoCamera />
+            </IconButton>
+          </label>
+        </Box>
       </DialogContent>
       <DialogActions>
-        <Button type="submit" color="success" onClick={() => formik.handleSubmit()}>
-          Register
-        </Button>
+        <Button label='Register' color="success" onClick={() => formik.handleSubmit()}>Register</Button>
       </DialogActions>
     </Dialog>
   );
