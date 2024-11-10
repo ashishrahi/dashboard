@@ -218,34 +218,26 @@ export default function FullFeaturedCrudGrid() {
   };
 
   const columns: GridColDef[] = [
-    {
-      field: 'image',
-      headerName: 'Driver Image',
-      width: 120,
+    {field: 'srno',  headerName: 'Srno.', type: 'date',width: 150,},
+    {field: 'createdate',  headerName: 'Created date', type: 'date',width: 150,},
+    { field: 'rolename', headerName: 'Role Name', width: 150 },
+    {field: 'status', headerName: 'Status',width: 150,
       renderCell: (params) => (
-        <Avatar alt={params.row.name} src={params.value} />
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            color: getStatusColor(params.value),
+          }}
+        >
+          {getStatusIcon(params.value)}
+          <span style={{ marginLeft: 8 }}>{params.value}</span>
+        </Box>
       ),
+      type: 'singleSelect',
+      valueOptions: statuses,
     },
-    { field: 'drivername', headerName: 'Driver Name', width: 180 },
-    { field: 'mobile', headerName: 'Mobile Number', width: 180 },
-    { field: 'aadharImage', headerName: 'Aadhar Image', width: 180 },  // Fixed duplicate field name
-    { field: 'aadharname', headerName: 'Aadhar Name', width: 180 },
-    { field: 'warehouse', headerName: 'Ware House', width: 180 },
-    { field: 'driveraddress', headerName: 'Driver Address', width: 180 },
-    { field: 'bankdetails', headerName: 'Bank Details', width: 180 },
-
-
-
-    {
-      field: 'joinDate',
-      headerName: 'Join date',
-      type: 'date',
-      width: 180,
-    },
-    {
-      field: 'status',
-      headerName: 'Status',
-      width: 180,
+    {field: 'permissionstatus', headerName: 'Permission Status',width: 150,
       renderCell: (params) => (
         <Box
           sx={{

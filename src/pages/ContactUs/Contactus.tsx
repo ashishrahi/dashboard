@@ -4,10 +4,8 @@ import Paper from '@mui/material/Paper';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { IconButton, Menu, MenuItem, Button, Chip, Snackbar, Alert, Tooltip, Avatar } from '@mui/material';
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import AddCategoryModal from './addCategory'; // Adjust import if necessary
-import UpdateCategoryModal from './updateCategory'; // Adjust import if necessary
-import { useCategory, useStatusMutationCategory } from '../../../services/Api/categoryApi/mutationCategory'; // Adjust import if necessary
-import { CancelIcon, CheckCircleIcon } from '../../../components/icons/Icons';
+import { useContact, useStatusMutationContact } from '../../services/Api/contactApi/Contact.api'; // Adjust import if necessary
+import { CancelIcon, CheckCircleIcon } from '../../components/icons/Icons';
 import { CSVLink } from 'react-csv';
 import Papa from 'papaparse';
 import AddIcon from '@mui/icons-material/Add';
@@ -22,8 +20,8 @@ const DataTable = () => {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
-  const { data, refetch } = useCategory();
-  const { mutateAsync: statusMutation } = useStatusMutationCategory();
+  const { data, refetch } = useContact();
+  const { mutateAsync: statusMutation } = useStatusMutationContact();
   const [anchorEl, setAnchorEl] = useState(null);
 
   useEffect(() => {
@@ -31,11 +29,13 @@ const DataTable = () => {
       const updatedRows = data.map((item, index) => ({
         _id: item._id,
         serialNumber: index + 1,
-        categoryname: item.categoryname,
-        categorydescription: item.categorydescription,
+        name: item.name,
+        email: item.email,
+        phone: item.phone,
+        message: item.message,
+
         createdAt: item.createdAt,
         status: item.status,
-        image: item.image, // Adding image field
       }));
       setRows(updatedRows);
     }
@@ -52,7 +52,7 @@ const DataTable = () => {
       try {
         const row = rows.find((row) => row._id === id);
         const updatedStatus = !row.status;
-        await statusMutation(id);
+        // await statusMutation(id);
         setRows((prevRows) =>
           prevRows.map((row) =>
             row._id === id ? { ...row, status: updatedStatus } : row
@@ -66,7 +66,7 @@ const DataTable = () => {
         setSnackbarOpen(true);
       }
     }, 300),
-    [rows, statusMutation]
+    // [rows, statusMutation]
   );
 
   const handleStatusToggle = (id) => {
@@ -99,8 +99,11 @@ const DataTable = () => {
         const importedRows = results.data.map((item, index) => ({
           _id: item._id || `imported_${index}`,
           serialNumber: index + 1,
-          categoryname: item.categoryname,
-          categorydescription: item.categorydescription,
+          name: item.name,
+          email: item.email,
+          phone: item.phone,
+          message: item.message,
+
           createdAt: item.createdAt,
           status: item.status === 'Active',
           image: item.image, // Include image from imported data
@@ -122,18 +125,11 @@ const DataTable = () => {
 
   const columns = useMemo(() => [
     { field: 'serialNumber', headerName: 'S/no.', width: 100 },
-    { field: 'createdAt', headerName: 'Created At', width: 180 },
-    
-    {
-      field: 'image',
-      headerName: 'Category Image',
-      width: 180,
-      renderCell: (params) => (
-        <Avatar src={params.row.image} alt={params.row.categoryname} />
-      ),
-    },
-    { field: 'categoryname', headerName: 'Category Name', width: 200 },
-    { field: 'categorydescription', headerName: 'Description', width: 250 },
+    { field: 'createdAt', headerName: 'Created Date', width: 180 },
+    { field: 'name', headerName: 'Name', width: 180 },
+    { field: 'email', headerName: 'Email', width: 180 },
+    { field: 'phone', headerName: 'Phone', width: 180 },
+    { field: 'message', headerName: 'Message', width: 200 },
     {
       field: 'status',
       headerName: 'Status',
@@ -169,7 +165,7 @@ const DataTable = () => {
     <>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
         <Button onClick={() => setAddModalOpen(true)} variant="text" color="primary">
-          <AddIcon />Category
+          Contact-List
         </Button>
         <Tooltip title='Import & Export Data'>
           <IconButton onClick={handleMenuClick} style={{ width: '48px', height: '48px' }}>
@@ -217,8 +213,6 @@ const DataTable = () => {
         />
       </Paper>
 
-      <AddCategoryModal open={addModalOpen} onClose={() => setAddModalOpen(false)} onAdd={handleAddCategory} />
-      <UpdateCategoryModal open={updateModalOpen} onClose={() => setUpdateModalOpen(false)} category={selectedCategory} id={selectedCategory?._id} onUpdate={handleUpdateCategory} />
 
       <Snackbar 
         open={snackbarOpen} 

@@ -220,19 +220,18 @@ export default function FullFeaturedCrudGrid() {
   const columns: GridColDef[] = [
     {
       field: 'image',
-      headerName: 'Driver Image',
+      headerName: 'Image',
       width: 120,
       renderCell: (params) => (
         <Avatar alt={params.row.name} src={params.value} />
       ),
     },
-    { field: 'drivername', headerName: 'Driver Name', width: 180 },
+    { field: 'warename', headerName: 'Warehouse Name', width: 180 },
     { field: 'mobile', headerName: 'Mobile Number', width: 180 },
-    { field: 'aadharImage', headerName: 'Aadhar Image', width: 180 },  // Fixed duplicate field name
-    { field: 'aadharname', headerName: 'Aadhar Name', width: 180 },
+    { field: 'email', headerName: 'Email', width: 180 },  // Fixed duplicate field name
     { field: 'warehouse', headerName: 'Ware House', width: 180 },
-    { field: 'driveraddress', headerName: 'Driver Address', width: 180 },
-    { field: 'bankdetails', headerName: 'Bank Details', width: 180 },
+    { field: 'typep', headerName: 'Type', width: 180 },
+    { field: 'address', headerName: 'Warehouse Address', width: 180 },
 
 
 

@@ -157,7 +157,7 @@ const DataTable = () => {
   return (
     <>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-        <Button  onClick={() => setAddModalOpen(true)} variant="contained" color="success">
+        <Button  onClick={() => setAddModalOpen(true)} variant="text" color="primary">
           Users - List
         </Button>
         <Tooltip title='Import & Export Data'>

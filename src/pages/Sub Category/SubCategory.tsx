@@ -23,6 +23,7 @@ const DataTable = () => {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const { data, refetch } = useSubCategory();
+  console.table(data)
   console.log(data);
   const { mutateAsync: statusMutation } = useStatusMutationSubCategory();
   const [anchorEl, setAnchorEl] = useState(null);
@@ -36,6 +37,7 @@ const DataTable = () => {
         subcategoryname: item.subcategoryname,
         subcategordescription: item.subcategordescription,
         createdAt: item.createdAt,
+        priceWithUnit:item.priceWithUnit,
         status: item.status,
         image: item.image, // Adding image field
       }));
@@ -104,6 +106,7 @@ const DataTable = () => {
           categoryname: item.categoryname,
           subcategordescription: item.subcategordescription,
           createdAt: item.createdAt,
+          priceWithUnit:item.priceWithUnit,
           status: item.status === 'Active',
           image: item.image, // Include image from imported data
         }));
@@ -137,6 +140,8 @@ const DataTable = () => {
     { field: 'categoryname', headerName: 'Category Name', width: 200 },
     { field: 'subcategoryname', headerName: 'Sub Category Name', width: 200 },
     { field: 'subcategordescription', headerName: 'Sub Category Description', width: 250 },
+    { field: 'priceWithUnit', headerName: 'price/unit', width: 250 },
+   
     {
       field: 'status',
       headerName: 'Status',
@@ -171,7 +176,7 @@ const DataTable = () => {
   return (
     <>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-        <Button onClick={() => setAddModalOpen(true)} variant="contained" color="primary">
+        <Button onClick={() => setAddModalOpen(true)} variant="text" color="primary">
           <AddIcon />Sub Category
         </Button>
         <Tooltip title='Import & Export Data'>

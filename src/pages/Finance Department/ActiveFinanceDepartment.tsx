@@ -13,7 +13,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import TextField from '@mui/material/TextField';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
 import Link from '@mui/material/Link';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom'; // Updated import
 import {
   GridRowsProp,
   GridRowModesModel,
@@ -75,26 +75,14 @@ function EditToolbar(props: EditToolbarProps) {
 
   const handleAddClick = () => {
     const id = randomId();
-    const newRow = { 
-      id, 
-      name: '', 
-      age: '', 
-      status: 'Pending', 
-      avatar: '', 
-      isNew: true, 
-      joinDate: new Date() 
-    };
-    
-    setRows((oldRows) => [...oldRows, newRow]);
+    setRows((oldRows) => [
+      ...oldRows,
+      { id, name: '', age: '', status: 'Pending', avatar: '', isNew: true },
+    ]);
     setRowModesModel((oldModel) => ({
       ...oldModel,
       [id]: { mode: GridRowModes.Edit, fieldToFocus: 'name' },
     }));
-
-    // Open the modal for the new row
-    setModalRow(newRow);
-    setCurrentRowId(id);
-    setOpenModal(true);
   };
 
   return (
@@ -115,7 +103,7 @@ export default function FullFeaturedCrudGrid() {
   const [modalRow, setModalRow] = React.useState<GridRowModel | null>(null);
 
   const navigate = useNavigate();
-  const location = useLocation();
+  const location = useLocation(); // Hook for location
 
   const handleRowEditStop: GridEventListener<'rowEditStop'> = (params, event) => {
     if (params.reason === GridRowEditStopReasons.rowFocusOut) {
@@ -132,9 +120,7 @@ export default function FullFeaturedCrudGrid() {
 
   const handleSaveClick = () => {
     if (modalRow) {
-      setRows((prevRows) => 
-        prevRows.map((row) => (row.id === modalRow.id ? modalRow : row))
-      );
+      setRows(rows.map((row) => (row.id === modalRow.id ? modalRow : row)));
     }
     setOpenModal(false);
   };
@@ -218,15 +204,30 @@ export default function FullFeaturedCrudGrid() {
   };
 
   const columns: GridColDef[] = [
-    {field: 'joinDate',headerName: 'Join date',type: 'date',width: 180,},
-    { field: 'name', headerName: 'Name', width: 180 },
-    { field: 'mobile', headerName: 'Mobile', width: 180 },
-    { field: 'email', headerName: 'Email', width: 180 },  
-    { field: 'type', headerName: 'Type', width: 180 },
-    { field: 'address', headerName: 'Finance Depart Address', width: 180 },
-
-
-
+    {
+      field: 'avatar',
+      headerName: 'Subcategory Image',
+      width: 180,
+      renderCell: (params) => (
+        <Avatar alt={params.row.name} src={params.value} />
+      ),
+    },
+    { field: 'name', headerName: 'Subcategory Name', width: 180 },
+    {
+      field: 'age',
+      headerName: 'Category Name',
+      type: 'number',
+      width: 180,
+      align: 'left',
+      headerAlign: 'left',
+    },
+    {
+      field: 'role',
+      headerName: 'Unit/Price',
+      width: 180,
+      type: 'singleSelect',
+      valueOptions: roles,
+    },
     {
       field: 'joinDate',
       headerName: 'Join date',
@@ -285,103 +286,119 @@ export default function FullFeaturedCrudGrid() {
 
   const handleModalChange = (field: string, value: any) => {
     if (modalRow) {
-      const newValue = field === 'joinDate' ? new Date(value) : value;
-      setModalRow({ ...modalRow, [field]: newValue });
+      setModalRow({ ...modalRow, [field]: value });
     }
   };
 
+  // Function to generate breadcrumb links based on location
+  const generateBreadcrumbs = () => {
+    const pathnames = location.pathname.split('/').filter((x) => x);
+    return [
+      { to: '/', label: 'Home' }, // Add "Home" link
+      ...pathnames.map((value, index) => {
+        const to = `/${pathnames.slice(0, index + 1).join('/')}`;
+        return {
+          to,
+          label: value.charAt(0).toUpperCase() + value.slice(1),
+        };
+      }),
+    ].map(({ to, label }) => (
+      <Link key={to} color="inherit" onClick={() => navigate(to)} sx={{textDecoration:'none'}}>
+        {label}
+      </Link>
+    ));
+  };
+
   return (
-    <>
-      <Breadcrumbs aria-label="breadcrumb">
-        <Link color="inherit" href="/" onClick={() => navigate('/')}>
-          Home
-        </Link>
-        <Link color="inherit" href="#" onClick={() => navigate(location.pathname)}>
-          Drivers
-        </Link>
-        <Link
-          color="text.primary"
-          href="/getting-started/installation/"
-          onClick={() => navigate('/getting-started/installation/')}
-          aria-current="page"
-        >
-          DataGrid with Modal Editing
-        </Link>
-      </Breadcrumbs>
-      <Box sx={{ height: 400, width: '100%' }}>
+    <Box sx={{ width: '100%' }}>
+      <Box sx={{ marginBottom: 2 }}>
+        <Breadcrumbs aria-label="breadcrumb">
+          {generateBreadcrumbs()}
+        </Breadcrumbs>
+      </Box>
+
+      <div style={{ height: 600, width: '100%' }}>
         <DataGrid
           rows={rows}
           columns={columns}
           editMode="row"
           rowModesModel={rowModesModel}
-          onRowModesModelChange={handleRowModesModelChange}
           onRowEditStop={handleRowEditStop}
           processRowUpdate={processRowUpdate}
-          slots={{
-            toolbar: EditToolbar,
+          onRowModesModelChange={handleRowModesModelChange}
+          components={{
+            Toolbar: EditToolbar,
           }}
-          slotProps={{
+          componentsProps={{
             toolbar: { setRows, setRowModesModel },
           }}
         />
-      </Box>
+      </div>
+
       <Dialog open={openModal} onClose={() => setOpenModal(false)}>
-        <DialogTitle>Edit Driver</DialogTitle>
+        <DialogTitle>Edit Record</DialogTitle>
         <DialogContent>
           <TextField
             margin="dense"
-            label="Driver Name"
+            label="Name"
             type="text"
             fullWidth
-            value={modalRow?.drivername ?? ''}
-            onChange={(e) => handleModalChange('drivername', e.target.value)}
+            variant="standard"
+            value={modalRow?.name ?? ''}
+            onChange={(e) => handleModalChange('name', e.target.value)}
           />
           <TextField
             margin="dense"
-            label="Mobile Number"
-            type="text"
+            label="Age"
+            type="number"
             fullWidth
-            value={modalRow?.mobile ?? ''}
-            onChange={(e) => handleModalChange('mobile', e.target.value)}
-          />
-          <TextField
-            margin="dense"
-            label="Aadhar Image"
-            type="text"
-            fullWidth
-            value={modalRow?.aadharImage ?? ''}
-            onChange={(e) => handleModalChange('aadharImage', e.target.value)}
-          />
-          <TextField
-            margin="dense"
-            label="Aadhar Name"
-            type="text"
-            fullWidth
-            value={modalRow?.aadharname ?? ''}
-            onChange={(e) => handleModalChange('aadharname', e.target.value)}
+            variant="standard"
+            value={modalRow?.age ?? ''}
+            onChange={(e) => handleModalChange('age', Number(e.target.value))}
           />
           <TextField
             margin="dense"
             label="Join Date"
             type="date"
             fullWidth
-            value={modalRow?.joinDate?.toISOString().split('T')[0] ?? ''}
+            InputLabelProps={{ shrink: true }}
+            value={modalRow?.joinDate.toISOString().substring(0, 10) ?? ''}
             onChange={(e) => handleModalChange('joinDate', e.target.value)}
           />
           <TextField
             margin="dense"
+            label="Role"
+            select
+            fullWidth
+            value={modalRow?.role ?? ''}
+            onChange={(e) => handleModalChange('role', e.target.value)}
+          >
+            {roles.map((role) => (
+              <MenuItem key={role} value={role}>
+                {role}
+              </MenuItem>
+            ))}
+          </TextField>
+          <TextField
+            margin="dense"
             label="Status"
-            type="text"
+            select
             fullWidth
             value={modalRow?.status ?? ''}
             onChange={(e) => handleModalChange('status', e.target.value)}
-          />
+          >
+            {statuses.map((status) => (
+              <MenuItem key={status} value={status}>
+                {status}
+              </MenuItem>
+            ))}
+          </TextField>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpenModal(false)}>Cancel</Button>
           <Button onClick={handleSaveClick}>Save</Button>
         </DialogActions>
       </Dialog>
-    </>
+    </Box>
   );
 }

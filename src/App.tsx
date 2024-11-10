@@ -17,9 +17,9 @@ import Subcategory from './pages/Sub Category/SubCategory';
 import ActiveSubcategory from './pages/Sub Category/ActiveSubCategory'
 import InactiveSubcategory from './pages/Sub Category/InActiveSubcategory'
 
-import Drivers from './pages/Drivers/Drivers';
-import ActiveDriver from './pages/Drivers/ActiveDrivers'
-import InactiveDriver from './pages/Drivers/InactiveDrivers'
+import Drivers from './pages/Drivers/Driver';
+import ActiveDriver from './pages/Drivers/ActiveDriver'
+import InactiveDriver from './pages/Drivers/InactiveDriver'
 
 import DefaultLayout from './layout/DefaultLayout';
 
@@ -42,15 +42,15 @@ import RoleCreation from './pages/Role Mangers/RoleCreation';
 import Collection from '../src/pages/Collections/Collections';
 import Today from '../src/pages/Collections/Today';
 
-import ContactUs from './pages/Contact Us/ContactUs';
+import ContactUs from './pages/ContactUs/Contactus';
 
 import Profile from './components/Profile';
 import Settings from './components/Settings';
 import SignIn from './pages/Authentication/SignIn';
 
 import FinanceDepartment from './pages/Finance Department/FinanceDepartment'
-import ActiveFinanceDepartment from './pages/Finance Department/ActiveFinanceDepart'
-import InactiveFinanceDepartment from './pages/Finance Department/InactiveFinanceDepart'
+import ActiveFinanceDepartment from './pages/Finance Department/ActiveFinanceDepartment'
+import InactiveFinanceDepartment from './pages/Finance Department/InActiveFinanceDepartment'
   // Location
 import Country from './pages/Locations/Country/Country'
 import State from './pages/Locations/State/State'

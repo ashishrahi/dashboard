@@ -4,10 +4,10 @@ import Paper from '@mui/material/Paper';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { IconButton, Menu, MenuItem, Button, Chip, Snackbar, Alert, Tooltip, Avatar } from '@mui/material';
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import AddCategoryModal from './addCategory'; // Adjust import if necessary
-import UpdateCategoryModal from './updateCategory'; // Adjust import if necessary
-import { useCategory, useStatusMutationCategory } from '../../../services/Api/categoryApi/mutationCategory'; // Adjust import if necessary
-import { CancelIcon, CheckCircleIcon } from '../../../components/icons/Icons';
+import AddWarehouseModal from './addDriver'; // Adjust the import path as needed
+import UpdateWarehouseModal from './updateDrivers'; // Adjust the import path as needed
+import { useDriver, useStatusMutationDriver } from '../../services/Api/driverApi/mutationDriver'; // Adjust the import path as needed
+import { CancelIcon, CheckCircleIcon } from '../../components/icons/Icons';
 import { CSVLink } from 'react-csv';
 import Papa from 'papaparse';
 import AddIcon from '@mui/icons-material/Add';
@@ -15,15 +15,15 @@ import { debounce } from 'lodash';
 import AutorenewIcon from '@mui/icons-material/Autorenew';
 import EditIcon from '@mui/icons-material/Edit';
 
-const DataTable = () => {
+const WarehouseTable = () => {
   const [rows, setRows] = useState([]);
   const [addModalOpen, setAddModalOpen] = useState(false);
   const [updateModalOpen, setUpdateModalOpen] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [selectedWarehouse, setSelectedWarehouse] = useState(null);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
-  const { data, refetch } = useCategory();
-  const { mutateAsync: statusMutation } = useStatusMutationCategory();
+  const { data, refetch } = useDriver();
+  const { mutateAsync: statusMutation } = useStatusMutationDriver();
   const [anchorEl, setAnchorEl] = useState(null);
 
   useEffect(() => {
@@ -31,19 +31,29 @@ const DataTable = () => {
       const updatedRows = data.map((item, index) => ({
         _id: item._id,
         serialNumber: index + 1,
-        categoryname: item.categoryname,
-        categorydescription: item.categorydescription,
+        avatar:item.avatar,
+        name: item.name,
+        email: item.email,
+        mobile: item.mobile,
+        warehouse:item.warehouse,
+        financedepart:item.financedepart,
+        bankname:item.bankname,
+        accountholdername:item.accountholdername,
+        bankaccountnumber:item.bankaccountnumber,
+        ifsccode:item.ifsccode,
+        aadhaarno:item.aadhaarno,
+        aadhaarimage:item.aadhaarimage,
+        address:item.address,
         createdAt: item.createdAt,
         status: item.status,
-        image: item.image, // Adding image field
       }));
       setRows(updatedRows);
     }
   }, [data]);
 
   const handleEdit = (id) => {
-    const categoryToEdit = rows.find(row => row._id === id);
-    setSelectedCategory(categoryToEdit);
+    const warehouseToEdit = rows.find(row => row._id === id);
+    setSelectedWarehouse(warehouseToEdit);
     setUpdateModalOpen(true);
   };
 
@@ -58,11 +68,11 @@ const DataTable = () => {
             row._id === id ? { ...row, status: updatedStatus } : row
           )
         );
-        setSnackbarMessage(`Category status updated to ${updatedStatus ? 'Active' : 'Inactive'}`);
+        setSnackbarMessage(`Warehouse status updated to ${updatedStatus ? 'Active' : 'Inactive'}`);
         setSnackbarOpen(true);
       } catch (error) {
         console.error('Error updating status', error);
-        setSnackbarMessage('Error updating category status');
+        setSnackbarMessage('Error updating warehouse status');
         setSnackbarOpen(true);
       }
     }, 300),
@@ -73,14 +83,14 @@ const DataTable = () => {
     debouncedStatusToggle(id);
   };
 
-  const handleAddCategory = (newCategory) => {
-    setRows((prevRows) => [...prevRows, newCategory]);
+  const handleAddWarehouse = (newWarehouse) => {
+    setRows((prevRows) => [...prevRows, newWarehouse]);
     refetch();
   };
 
-  const handleUpdateCategory = (updatedCategory) => {
+  const handleUpdateWarehouse = (updatedWarehouse) => {
     setRows((prevRows) =>
-      prevRows.map(row => (row._id === updatedCategory._id ? updatedCategory : row))
+      prevRows.map(row => (row._id === updatedWarehouse._id ? updatedWarehouse : row))
     );
     setUpdateModalOpen(false);
     refetch();
@@ -97,16 +107,26 @@ const DataTable = () => {
       skipEmptyLines: true,
       complete: (results) => {
         const importedRows = results.data.map((item, index) => ({
-          _id: item._id || `imported_${index}`,
-          serialNumber: index + 1,
-          categoryname: item.categoryname,
-          categorydescription: item.categorydescription,
-          createdAt: item.createdAt,
-          status: item.status === 'Active',
-          image: item.image, // Include image from imported data
+        _id: item._id || `imported_${index}`,
+        serialNumber: index + 1,
+        avatar:item.avatar,
+        name: item.name,
+        email: item.email,
+        mobile: item.mobile,
+        bankname:item.bankname,
+        accountholdername:item.accountholdername,
+        bankaccountnumber:item.bankaccountnumber,
+        financedepart:item.financedepart,
+        warehouse:item.warehouse,
+        ifsccode:item.ifsccode,
+        aadhaarno:item.aadhaarno,
+        aadhaarimage:item.aadhaarimage,
+        address:item.address,
+        createdAt: item.createdAt,
+        status: item.status,
         }));
         setRows(importedRows);
-        setSnackbarMessage('Categories imported successfully!');
+        setSnackbarMessage('Warehouses imported successfully!');
         setSnackbarOpen(true);
       },
     });
@@ -121,23 +141,62 @@ const DataTable = () => {
   };
 
   const columns = useMemo(() => [
-    { field: 'serialNumber', headerName: 'S/no.', width: 100 },
+    { field: 'serialNumber', headerName: 'S/no.', width: 180 },
     { field: 'createdAt', headerName: 'Created At', width: 180 },
-    
     {
-      field: 'image',
-      headerName: 'Category Image',
+      field: 'avatar',
+      headerName: 'Profile Image',
       width: 180,
       renderCell: (params) => (
-        <Avatar src={params.row.image} alt={params.row.categoryname} />
+        <Avatar 
+          src={params.row.avatar} 
+          alt={params.row.warehouseName} 
+          sx={{ 
+            width: '100%', 
+            height: '100%', 
+            borderRadius: 1 // Use borderRadius for rectangle shape
+          }} 
+        />
       ),
     },
-    { field: 'categoryname', headerName: 'Category Name', width: 200 },
-    { field: 'categorydescription', headerName: 'Description', width: 250 },
-    {
+    { field: 'name', headerName: 'Driver Name', width: 180 },
+    { field: 'email', headerName: 'Email', width: 180 },
+    { field: 'mobile', headerName: 'Phone', width: 180 },
+    { field: 'address', headerName: 'Address', width: 180 },
+    // AAdhaar
+    { field: 'aadhaarno', headerName: 'AAdhaar Number', width: 180 },
+    {    field: 'aadhaarimage',
+      headerName: 'AAdhaar Image',
+      width: 180,
+      renderCell: (params) => (
+        <Avatar 
+          src={params.row.aadhaarimage} 
+          alt={params.row.aadhaarName} 
+          sx={{ 
+            width: '100%', 
+            height: '100%', 
+            borderRadius: 1 // Use borderRadius for rectangle shape
+          }} 
+        />
+      ), },
+
+      // Warehouse
+      { field: 'warehouse', headerName: 'Warehouse', width: 180 },
+      
+      // Backdetails 
+      { field: 'bankname', headerName: 'Bank Name', width: 180 },
+      { field: 'accountholdername', headerName: 'Account Holder Name', width: 180 },
+      { field: 'bankaccountnumber', headerName: 'Bank Account Number', width: 180 },
+      { field: 'ifsccode', headerName: 'IFSC Code', width: 180 },
+
+    // Finance Departments
+    { field: 'financedepart', headerName: 'Finance Depart', width: 180 },
+
+// Status
+     {
       field: 'status',
       headerName: 'Status',
-      width: 120,
+      width: 180,
       renderCell: (params) => (
         <div className={`cellWithStatus ${params.row.status}`}>
           <Chip
@@ -153,7 +212,7 @@ const DataTable = () => {
     {
       field: 'actions',
       headerName: 'Actions',
-      width: 130,
+      width: 180,
       renderCell: (params) => (
         <ActionsMenu
           id={params.id}
@@ -168,8 +227,8 @@ const DataTable = () => {
   return (
     <>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-        <Button onClick={() => setAddModalOpen(true)} variant="text" color="primary">
-          <AddIcon />Category
+        <Button onClick={() => setAddModalOpen(true)} variant="text" color="primary" >
+          <AddIcon /> Add Driver
         </Button>
         <Tooltip title='Import & Export Data'>
           <IconButton onClick={handleMenuClick} style={{ width: '48px', height: '48px' }}>
@@ -193,7 +252,7 @@ const DataTable = () => {
               <label htmlFor="csv-upload" style={{ cursor: 'pointer' }}>Import from CSV</label>
             </MenuItem>
             <MenuItem onClick={handleMenuClose}>
-              <CSVLink data={rows} filename={"categories.csv"}>
+              <CSVLink data={rows} filename={"warehouses.csv"}>
                 Export to CSV
               </CSVLink>
             </MenuItem>
@@ -217,8 +276,8 @@ const DataTable = () => {
         />
       </Paper>
 
-      <AddCategoryModal open={addModalOpen} onClose={() => setAddModalOpen(false)} onAdd={handleAddCategory} />
-      <UpdateCategoryModal open={updateModalOpen} onClose={() => setUpdateModalOpen(false)} category={selectedCategory} id={selectedCategory?._id} onUpdate={handleUpdateCategory} />
+      <AddWarehouseModal open={addModalOpen} onClose={() => setAddModalOpen(false)} onAdd={handleAddWarehouse} />
+      <UpdateWarehouseModal open={updateModalOpen} onClose={() => setUpdateModalOpen(false)} warehouse={selectedWarehouse} id={selectedWarehouse?._id} onUpdate={handleUpdateWarehouse} />
 
       <Snackbar 
         open={snackbarOpen} 
@@ -254,22 +313,16 @@ const ActionsMenu = ({ id, currentStatus, onEdit, onToggleStatus }) => {
         open={Boolean(anchorEl)}
         onClose={handleClose}
       >
-        <MenuItem onClick={() => { onEdit(id); handleClose(); }}>   <EditIcon  style={{ 
-      marginRight: 8,
-      color: 'blue' 
-    }}/>Edit</MenuItem>
+        <MenuItem onClick={() => { onEdit(id); handleClose(); }}>
+          <EditIcon style={{ marginRight: 8, color: 'blue' }} />Edit
+        </MenuItem>
         <MenuItem onClick={() => { onToggleStatus(id); handleClose(); }}>
-       <AutorenewIcon
-    style={{ 
-      marginRight: 8,
-      color: currentStatus ? 'red' : 'green' 
-    }}
-  />
-  {currentStatus ? 'Deactivate' : 'Activate'}
-</MenuItem>
+          <AutorenewIcon style={{ marginRight: 8, color: currentStatus ? 'red' : 'green' }} />
+          {currentStatus ? 'Deactivate' : 'Activate'}
+        </MenuItem>
       </Menu>
     </>
   );
 };
 
-export default DataTable;
+export default WarehouseTable;
